@@ -1,7 +1,7 @@
 {
-  "name": "adonis-mongo-boilerplate",
-  "version": "4.1.0",
-  "description": "A boilerplate Rest API build on Adonisjs FW with LucidMongo and swagger-jsdoc Edit",
+  "name": "yoto_backend",
+  "version": "2.0.0",
+  "description": "Yoto backend includes api, socket, admin panel",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
