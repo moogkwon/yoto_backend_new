@@ -24,6 +24,7 @@ const providers = [
   '@adonisjs/session/providers/SessionProvider',
   '@adonisjs/ally/providers/AllyProvider',
   '@adonisjs/redis/providers/RedisProvider',
+  'adonis-websocket/providers/WsProvider',
   'lucid-mongo/providers/LucidMongoProvider',
   Helpers.appRoot('app/Providers/ExtendValidatorProvider'),
   Helpers.appRoot('app/Providers/ExtendResponseProvider'),
@@ -57,7 +58,8 @@ const aceProviders = [
 |
 */
 const aliases = {
-  Exceptions: 'App/Exceptions'
+  Exceptions: 'App/Exceptions',
+  Ws: 'Adonis/Addons/Ws'
 }
 
 /*

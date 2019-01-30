@@ -1,14 +1,17 @@
 'use strict'
 
-/*
-|--------------------------------------------------------------------------
-| Websocket Config
-|--------------------------------------------------------------------------
-|
-| Used by AdonisJs websocket server
-|
-*/
 module.exports = {
+  /*
+  |--------------------------------------------------------------------------
+  | Using The Same Http Server
+  |--------------------------------------------------------------------------
+  |
+  | Using the same http server for websockets too. If you set this to false
+  | make sure to attach a custom http server using Ws.attach()
+  |
+  */
+  useHttpServer: true,
+  useUws: false,
   pingTimeout: 10000,
   pingInterval: 5000
 }
