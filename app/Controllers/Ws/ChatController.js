@@ -6,14 +6,18 @@ class ChatController {
   constructor ({ socket, request, auth }) {
     if (String(auth.user._id) !== socket.topic.split(':')[1]) {
       socket.emit('error', 'Invalid topic subscription. You may only subscribe to your own topic.')
-      console.log('Invalid topic subscription. You may only subscribe to your own topic.', auth.user._id, socket.topic)
+      Logger.info('Invalid topic subscription. You may only subscribe to your own topic.', auth.user._id, socket.topic)
       socket.close()
     } else {
       this.socket = socket
       this.request = request
       this.user = auth.user
-      console.log('topic event connected', auth.user._id)
+      Logger.info('topic event connected', auth.user._id)
     }
+  }
+
+  onConnect () {
+    Logger.info('User connected', this.user._id)
   }
 
   onStartHunting () {

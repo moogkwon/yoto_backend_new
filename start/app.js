@@ -23,7 +23,7 @@ const providers = [
   '@adonisjs/vow/providers/VowProvider',
   '@adonisjs/session/providers/SessionProvider',
   '@adonisjs/ally/providers/AllyProvider',
-  '@adonisjs/websocket/providers/WsProvider',
+  '@adonisjs/redis/providers/RedisProvider',
   'lucid-mongo/providers/LucidMongoProvider',
   Helpers.appRoot('app/Providers/ExtendValidatorProvider'),
   Helpers.appRoot('app/Providers/ExtendResponseProvider'),
