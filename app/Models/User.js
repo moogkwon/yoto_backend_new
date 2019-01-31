@@ -74,6 +74,10 @@ class User extends Model {
   images () {
     return this.morphMany('App/Models/Image', 'imageable_type', 'imageable_id')
   }
+
+  conversations () {
+    return this.hasMany('App/Models/Conversation', '_id', 'user_ids')
+  }
 }
 
 module.exports = User

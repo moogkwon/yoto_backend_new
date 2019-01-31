@@ -8,7 +8,7 @@
       "env": {
         "watch": true,
         "NODE_ENV": "development",
-        "DEBUG": "socket"
+        "DEBUG": "mquery,socket"
       },
       "env_production": {
         "NODE_ENV": "production",
