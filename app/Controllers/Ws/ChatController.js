@@ -3,6 +3,7 @@
 const debug = require('debug')('socket')
 const Ws = use('Ws')
 const Redis = use('Redis')
+const _ = require('lodash')
 
 class ChatController {
   /**
@@ -76,15 +77,16 @@ class ChatController {
         socket.socket.toMe().emit('conversation_close', { conversation_id: conversation._id, message: 'other user disconnected' })
         await Redis.sadd('hunting', String(userId))
       }
-      await conversation.delete()
+      conversation.status = 'rejected'
+      await conversation.save()
     }
     await Redis.srem('hunting', String(this.user._id))
     this.socket.toMe().emit('message', { message: 'you have left hunting mode' })
     debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you have left hunting mode' })
   }
 
-  async on_hunting_next () { // eslint-disable-line
-    debug('Incoming', '_hunting_next', this.user._id, this.socket.id)
+  async on_match_next () { // eslint-disable-line
+    debug('Incoming', '_match_next', this.user._id, this.socket.id)
     const chatChannel = Ws.channel('/chat')
     const conversation = await this.user.conversations().where({ status: { $nin: ['closed', 'rejected'] } }).first()
     if (conversation) {
@@ -96,11 +98,81 @@ class ChatController {
         socket.socket.toMe().emit('conversation_close', { conversation_id: conversation._id, message: 'other user rejected' })
         await Redis.sadd('hunting', String(userId))
       }
-      await conversation.delete()
+      conversation.status = 'rejected'
+      await conversation.save()
     }
     await Redis.sadd('hunting', String(this.user._id))
     this.socket.toMe().emit('message', { message: 'you rejoined hunting mode' })
     debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you rejoined hunting mode' })
+  }
+
+  async on_match_accept (data) { // eslint-disable-line
+    debug('Incoming', '_match_accept', this.user._id, this.socket.id)
+    const chatChannel = Ws.channel('/chat')
+    const conversation = await this.user.conversations().where({ status: 'waiting' }).first()
+    if (conversation) {
+      conversation.accepts[String(this.user._id)] = true
+      conversation.offers[String(this.user._id)] = data.offer
+      if (_.size(conversation.accepts) === 2) {
+        // change conversation state
+        conversation.status = 'calling'
+        // find and emit calling to other user
+        const userId = conversation.user_ids.find(id => String(id) !== String(this.user._id))
+        const socketid = await Redis.hget('users', userId)
+        const socket = chatChannel.get(socketid)
+        if (socket) {
+          socket.socket.toMe().emit('call_start', {
+            conversation_id: conversation._id,
+            user_id: this.user._id,
+            offer: conversation.offers[String(this.user._id)],
+            message: 'prepare to call'
+          })
+          debug('Outgoing', 'call_start', userId, socket.id, {
+            conversation_id: conversation._id,
+            user_id: this.user._id,
+            offer: conversation.offers[userId],
+            message: 'prepare to call'
+          })
+        }
+
+        // emit calling to current user
+        this.socket.toMe().emit('call_start', {
+          conversation_id: conversation._id,
+          user_id: userId,
+          message: 'prepare to call'
+        })
+        debug('Outgoing', 'call_start', this.user._id, this.socket.id, {
+          conversation_id: conversation._id,
+          user_id: userId,
+          message: 'prepare to call'
+        })
+      } else {
+        this.socket.toMe().emit('message', { message: 'waiting for other user accept/next' })
+        debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'waiting for other user accept/next' })
+      }
+      await conversation.save()
+    } else {
+      this.socket.toMe().emit('message', { message: 'you are not matching with anyone' })
+      debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you are not matching with anyone' })
+    }
+  }
+
+  async on_update_sdp (data) { // eslint-disable-line
+    debug('Incoming', '_update_sdp', this.user._id, this.socket.id)
+    const chatChannel = Ws.channel('/chat')
+    const conversation = await this.user.conversations().where({ status: 'calling' }).first()
+    if (conversation) {
+      const userId = conversation.user_ids.find(id => String(id) !== String(this.user._id))
+      const socketid = await Redis.hget('users', userId)
+      const socket = chatChannel.get(socketid)
+      if (socket) {
+        socket.socket.toMe().emit('update_sdp', { sdp: data.sdp })
+        debug('Outgoing', 'update_sdp', data.sdp)
+      }
+    } else {
+      this.socket.toMe().emit('message', { message: 'you are not matching with anyone' })
+      debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you are not matching with anyone' })
+    }
   }
 
   async onDisconnect () {
@@ -117,7 +189,8 @@ class ChatController {
           socket.socket.toMe().emit('conversation_close', { conversation_id: conversation._id, message: 'other user disconnected' })
           await Redis.sadd('hunting', String(userId))
         }
-        await conversation.delete()
+        conversation.status = 'rejected'
+        await conversation.save()
       }
       await Redis.hdel('users', this.user._id)
       await Redis.srem('hunting', this.user._id)

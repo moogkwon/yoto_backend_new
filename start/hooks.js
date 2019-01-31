@@ -35,7 +35,8 @@ const matchStart = async () => {
         const conversation = await Conversation.create({
           user_ids: [user1._id, user2._id],
           status: 'waiting',
-          accepts: {}
+          accepts: {},
+          offers: {}
         })
         debug('Outgoing', 'hunting_match', user1._id, socket1.id)
         socket1.socket.toMe().emit('hunting_match', { conversation_id: conversation._id, user: user2.toJSON() })
