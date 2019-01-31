@@ -13,13 +13,15 @@ const matchStart = async () => {
   const Conversation = use('App/Models/Conversation')
   const chat = Ws.channel('/chat')
   while (true) {
-    await sleep(1000)
+    await sleep(2000)
 
     let userIds = await Redis.smembers('hunting')
     await Redis.del('hunting')
     userIds = _.shuffle(userIds)
-    // console.log('userIDs', userIds)
     const pairs = _.chunk(userIds, 2)
+    if (pairs.length) {
+      debug('Get list matching', pairs)
+    }
     // console.log('pairs', pairs)
     const unSuccessUserIds = []
     await Promise.all(_.filter(pairs, item => item.length === 2).map(async pair => {
@@ -38,9 +40,10 @@ const matchStart = async () => {
           accepts: {},
           offers: {}
         })
-        debug('Outgoing', 'hunting_match', user1._id, socket1.id)
         socket1.socket.toMe().emit('hunting_match', { conversation_id: conversation._id, user: user2.toJSON() })
+        debug('Outgoing', 'hunting_match', user1._id, socket1.socket.id)
         socket2.socket.toMe().emit('hunting_match', { conversation_id: conversation._id, user: user1.toJSON() })
+        debug('Outgoing', 'hunting_match', user2._id, socket2.socket.id)
       } else {
         unSuccessUserIds.push(userId1)
         unSuccessUserIds.push(userId2)
