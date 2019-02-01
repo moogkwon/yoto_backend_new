@@ -280,7 +280,7 @@ Route.group('auth', () => {
    *         $ref: '#/components/responses/Unauthorized'
    */
   Route.post('/password', 'Api/AuthController.password').middleware('auth:jwt')
-}).prefix('/api/auth')
+}).prefix('/api/v1/auth')
 
 Route.get('auth/reset', 'Api/AuthController.getReset').as('reset')
 Route.post('auth/reset', 'Api/AuthController.postReset')

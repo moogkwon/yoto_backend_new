@@ -10,14 +10,14 @@ Route.get('api-specs', async ({ request, response }) => {
     definition: {
       openapi: '3.0.0',
       info: {
-        title: 'My REST API', // Title (required)
+        title: 'YOTO REST API', // Title (required)
         version: '1.0.0' // Version (required)
       },
       servers: [
-        { url: `/api` }
+        { url: `/api/v1` }
       ],
       // host: `${Config.get('host')}:${Config.get('port')}`,
-      basePath: '/api',
+      // basePath: '/api/v1',
       security: [
         { bearerAuth: [] }
       ],

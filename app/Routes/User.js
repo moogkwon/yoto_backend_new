@@ -218,4 +218,4 @@ Route.group('user', () => {
    */
   Route.post('/upload-profile-video', 'Api/UsersController.uploadProfileVideo')
     .middleware(['auth:jwt'])
-}).prefix('/api/users')
+}).prefix('/api/v1/users')

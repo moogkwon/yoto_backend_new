@@ -133,7 +133,11 @@ module.exports = {
     | is to true. Otherwise everything is processed manually.
     |
     */
-    processManually: []
+    processManually: [
+      '/api/v1/users/upload-avatar',
+      '/api/v1/users/upload-profile-url',
+      '/api/v1/users/upload-profile-video'
+    ]
 
     /*
     |--------------------------------------------------------------------------
