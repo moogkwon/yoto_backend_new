@@ -49,7 +49,8 @@ class ChatController {
 
     const conversation = await this.user.conversations().where({ status: { $nin: ['closed', 'rejected'] } }).first()
     if (conversation) {
-      this.socket.toMe().emit('matching_exists', { conversation_id: conversation._id })
+      this.socket.toMe().emit('match_exists', { conversation_id: conversation._id })
+      debug('Outgoing', 'match_exists', this.user._id, this.socket.id)
     }
   }
 
@@ -77,7 +78,7 @@ class ChatController {
       const socket = chatChannel.get(socketid)
       if (socket) {
         debug('Outgoing', 'message', userId, socket.socket.id, { message: 'other user disconnected' })
-        socket.socket.toMe().emit('conversation_close', { conversation_id: conversation._id, message: 'other user disconnected' })
+        socket.socket.toMe().emit('match_close', { conversation_id: conversation._id, message: 'other user disconnected' })
         await Redis.sadd('hunting', String(userId))
       }
       conversation.status = 'rejected'
@@ -99,7 +100,7 @@ class ChatController {
       const socket = chatChannel.get(socketid)
       if (socket) {
         debug('Outgoing', 'message', userId, socket.socket.id, { message: 'other user rejected' })
-        socket.socket.toMe().emit('conversation_close', { conversation_id: conversation._id, message: 'other user rejected' })
+        socket.socket.toMe().emit('match_close', { conversation_id: conversation._id, message: 'other user rejected' })
         await Redis.sadd('hunting', String(userId))
       }
       conversation.status = 'rejected'
@@ -152,8 +153,8 @@ class ChatController {
           message: 'prepare to call'
         })
       } else {
-        this.socket.toMe().emit('message', { message: 'waiting for other user accept/next' })
-        debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'waiting for other user accept/next' })
+        this.socket.toMe().emit('message', { message: 'you accepted match, waiting for other user accept/next' })
+        debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you accepted match, waiting for other user accept/next' })
       }
       await conversation.save()
     } else {
@@ -222,8 +223,8 @@ class ChatController {
           message: 'become friend'
         })
       } else {
-        this.socket.toMe().emit('message', { message: 'waiting for other user add friend' })
-        debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'waiting for other user add friend' })
+        this.socket.toMe().emit('message', { message: 'sent friend request, waiting for other' })
+        debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'sent friend request, waiting for other' })
       }
       await conversation.save()
     } else {
@@ -269,7 +270,7 @@ class ChatController {
         const socket = chatChannel.get(socketid)
         if (socket) {
           debug('Outgoing', 'message', userId, socket.socket.id, { message: 'other user disconnected' })
-          socket.socket.toMe().emit('conversation_close', { conversation_id: conversation._id, message: 'other user disconnected' })
+          socket.socket.toMe().emit('match_close', { conversation_id: conversation._id, message: 'other user disconnected' })
           await Redis.sadd('hunting', String(userId))
         }
         conversation.status = 'rejected'

@@ -41,10 +41,10 @@ const matchStart = async () => {
           offers: {},
           friends: {}
         })
-        socket1.socket.toMe().emit('hunting_match', { conversation_id: conversation._id, user: user2.toJSON() })
-        debug('Outgoing', 'hunting_match', user1._id, socket1.socket.id)
-        socket2.socket.toMe().emit('hunting_match', { conversation_id: conversation._id, user: user1.toJSON() })
-        debug('Outgoing', 'hunting_match', user2._id, socket2.socket.id)
+        socket1.socket.toMe().emit('match_new', { conversation_id: conversation._id, user: user2.toJSON() })
+        debug('Outgoing', 'match_new', user1._id, socket1.socket.id)
+        socket2.socket.toMe().emit('match_new', { conversation_id: conversation._id, user: user1.toJSON() })
+        debug('Outgoing', 'match_new', user2._id, socket2.socket.id)
       } else {
         unSuccessUserIds.push(userId1)
         unSuccessUserIds.push(userId2)
