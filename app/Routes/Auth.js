@@ -280,6 +280,99 @@ Route.group('auth', () => {
    *         $ref: '#/components/responses/Unauthorized'
    */
   Route.post('/password', 'Api/AuthController.password').middleware('auth:jwt')
+
+  /**
+   * @swagger
+   * /users/upload-avatar:
+   *   post:
+   *     tags:
+   *       - User
+   *     summary: Upload avatar
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         multipart/form-data:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               file:
+   *                 required: true
+   *                 type: string
+   *                 format: binary
+   *     responses:
+   *       200:
+   *         description: upload success
+   *       401:
+   *         $ref: '#/components/responses/Unauthorized'
+   *       403:
+   *         $ref: '#/components/responses/Forbidden'
+   *       422:
+   *         $ref: '#/components/responses/ValidateFailed'
+   */
+  Route.post('/upload-avatar', 'Api/UsersController.uploadAvatar')
+    .middleware(['auth:jwt'])
+
+  /**
+   * @swagger
+   * /users/upload-profile-photo:
+   *   post:
+   *     tags:
+   *       - User
+   *     summary: Upload profile photo
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         multipart/form-data:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               file:
+   *                 required: true
+   *                 type: string
+   *                 format: binary
+   *     responses:
+   *       200:
+   *         description: upload success
+   *       401:
+   *         $ref: '#/components/responses/Unauthorized'
+   *       403:
+   *         $ref: '#/components/responses/Forbidden'
+   *       422:
+   *         $ref: '#/components/responses/ValidateFailed'
+   */
+  Route.post('/upload-profile-photo', 'Api/UsersController.uploadProfilePhoto')
+    .middleware(['auth:jwt'])
+
+  /**
+   * @swagger
+   * /users/upload-profile-video:
+   *   post:
+   *     tags:
+   *       - User
+   *     summary: Upload profile video
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         multipart/form-data:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               file:
+   *                 required: true
+   *                 type: string
+   *                 format: binary
+   *     responses:
+   *       200:
+   *         description: upload success
+   *       401:
+   *         $ref: '#/components/responses/Unauthorized'
+   *       403:
+   *         $ref: '#/components/responses/Forbidden'
+   *       422:
+   *         $ref: '#/components/responses/ValidateFailed'
+   */
+  Route.post('/upload-profile-video', 'Api/UsersController.uploadProfileVideo')
+    .middleware(['auth:jwt'])
 }).prefix('/api/auth')
 
 Route.get('auth/reset', 'Api/AuthController.getReset').as('reset')
