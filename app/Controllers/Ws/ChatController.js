@@ -181,6 +181,57 @@ class ChatController {
     }
   }
 
+  async on_add_friend (data) { // eslint-disable-line
+    debug('=========================================================')
+    debug('Incoming', '_add_friend', this.user._id, this.socket.id)
+    const chatChannel = Ws.channel('/chat')
+    const conversation = await this.user.conversations().where({ status: 'calling' }).first()
+    if (conversation) {
+      conversation.friends[String(this.user._id)] = true
+      if (_.size(conversation.friends) === 2) {
+        // change conversation state
+        conversation.is_friend = true
+        // find and emit calling to other user
+        const userId = conversation.user_ids.find(id => String(id) !== String(this.user._id))
+        const otherUser = await conversation.users().where({ _id: { $ne: this.user._id } }).first()
+        const socketid = await Redis.hget('users', userId)
+        const socket = chatChannel.get(socketid)
+        if (socket) {
+          socket.socket.toMe().emit('become_friend', {
+            conversation_id: conversation._id,
+            user: this.user.toJSON(),
+            message: 'become friend'
+          })
+          debug('Outgoing', 'become_friend', userId, socket.socket.id, {
+            conversation_id: conversation._id,
+            user: this.user.toJSON(),
+            offer: conversation.offers[userId],
+            message: 'become friend'
+          })
+        }
+
+        // emit calling to current user
+        this.socket.toMe().emit('become_friend', {
+          conversation_id: conversation._id,
+          user: otherUser.toJSON(),
+          message: 'become friend'
+        })
+        debug('Outgoing', 'become_friend', this.user._id, this.socket.id, {
+          conversation_id: conversation._id,
+          user: otherUser.toJSON(),
+          message: 'become friend'
+        })
+      } else {
+        this.socket.toMe().emit('message', { message: 'waiting for other user add friend' })
+        debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'waiting for other user add friend' })
+      }
+      await conversation.save()
+    } else {
+      this.socket.toMe().emit('message', { message: 'you are not in calling' })
+      debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you are not in calling' })
+    }
+  }
+
   async on_call_hangup (data) { // eslint-disable-line
     debug('=========================================================')
     debug('Incoming', '_call_hangup', this.user._id, this.socket.id)
