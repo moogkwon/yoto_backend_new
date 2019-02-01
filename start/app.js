@@ -24,6 +24,7 @@ const providers = [
   '@adonisjs/session/providers/SessionProvider',
   '@adonisjs/ally/providers/AllyProvider',
   '@adonisjs/redis/providers/RedisProvider',
+  '@adonisjs/drive/providers/DriveProvider',
   'adonis-websocket/providers/WsProvider',
   'lucid-mongo/providers/LucidMongoProvider',
   Helpers.appRoot('app/Providers/ExtendValidatorProvider'),

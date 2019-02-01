@@ -128,13 +128,11 @@ Route.group('user', () => {
 
   /**
    * @swagger
-   * /users/{id}/upload:
+   * /users/upload-avatar:
    *   post:
    *     tags:
    *       - User
-   *     summary: Upload images to user
-   *     parameters:
-   *       - $ref: '#/components/parameters/Id'
+   *     summary: Upload avatar to user
    *     requestBody:
    *       required: true
    *       content:
@@ -142,18 +140,13 @@ Route.group('user', () => {
    *           schema:
    *             type: object
    *             properties:
-   *               image:
+   *               file:
    *                 required: true
    *                 type: string
    *                 format: binary
-   *               is_avatar:
-   *                 required: false
-   *                 type: boolean
    *     responses:
    *       200:
    *         description: upload success
-   *       404:
-   *         $ref: '#/components/responses/NotFound'
    *       401:
    *         $ref: '#/components/responses/Unauthorized'
    *       403:
@@ -161,7 +154,7 @@ Route.group('user', () => {
    *       422:
    *         $ref: '#/components/responses/ValidateFailed'
    */
-  Route.post('/:id/upload', 'Api/UsersController.upload')
+  Route.post('/:id/upload-avatar', 'Api/UsersController.uploadAvatar')
     .middleware(['auth:jwt'])
     .instance('App/Models/User')
 

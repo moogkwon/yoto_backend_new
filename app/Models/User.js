@@ -38,6 +38,16 @@ const Model = use('Model')
  *           properties:
  *             _id:
  *               type: string
+ *             avatar_url:
+ *               type: string
+ *             profile_photo_url:
+ *               type: string
+ *             video_photo_url:
+ *               type: string
+ *             profile_rejected:
+ *               type: boolean
+ *             is_blocked:
+ *               type: boolean
  */
 
 class User extends Model {

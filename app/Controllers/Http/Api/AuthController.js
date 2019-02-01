@@ -13,6 +13,7 @@ const Mail = use('Mail')
 const crypto = require('crypto')
 const uuid = require('uuid')
 const User = use('App/Models/User')
+const Drive = use('Drive')
 
 class AuthController extends BaseController {
   /**
@@ -132,35 +133,14 @@ class AuthController extends BaseController {
       throw LoginFailedException.invoke('Invalid token')
     }
     let user = null
-    if (socialUser.getEmail()) {
-      user = await User.findOrCreate({ email: socialUser.getEmail() }, {
-        name: socialUser.getName(),
-        email: socialUser.getEmail(),
-        verified: true,
-        social_id: socialUser.getId(),
-        password: use('uuid').v4(),
-        avatar: socialUser.getAvatar()
-      })
-    } else if (socialUser.getOriginal().phone_number) {
-      const userData = socialUser.getOriginal()
-      user = await User.findOrCreate({ phone_number: userData.phone_number }, {
-        name: userData.name,
-        email: userData.email,
-        verified: true,
-        social_id: socialUser.getId(),
-        password: use('uuid').v4(),
-        avatar: socialUser.getAvatar()
-      })
-    } else {
-      user = await User.findOrCreate({ social_id: socialUser.getId() }, {
-        name: socialUser.getName(),
-        email: socialUser.getEmail(),
-        verified: true,
-        social_id: socialUser.getId(),
-        password: use('uuid').v4(),
-        avatar: socialUser.getAvatar()
-      })
-    }
+    user = await User.findOrCreate({ social_id: socialUser.getId() }, {
+      name: socialUser.getName(),
+      email: socialUser.getEmail(),
+      verified: true,
+      social_id: socialUser.getId(),
+      password: use('uuid').v4(),
+      avatar_url: socialUser.getAvatar()
+    })
     const data = await auth.authenticator('jwt').generate(user)
     data.user = user
     return response.apiSuccess(data)
@@ -330,6 +310,99 @@ class AuthController extends BaseController {
     user.unset('verificationToken')
     await user.save()
     response.apiSuccess(user, 'Change password successfully')
+  }
+
+  /**
+   * Upload avatar
+   *
+   * @param {object} ctx
+   * @param {AuthSession} ctx.auth
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async uploadAvatar ({ request, response, auth }) {
+    const user = auth.user
+    const validate = {
+      size: '200kb',
+      types: ['image']
+    }
+    request.multipart.file('file', validate, async (file) => {
+      const fileName = `uploads/photos/${use('uuid').v1().replace(/-/g, '')}_${file.clientName}`
+      await Drive.disk('s3').put(fileName, file.stream)
+      if (user.avatar) {
+        try {
+          await Drive.delete(user.avatar)
+        } catch (error) { }
+      }
+      user.avatar = fileName
+      user.avatar_url = await Drive.disk('s3').getUrl(fileName)
+      await user.save()
+    })
+
+    await request.multipart.process()
+    return response.apiUpdated(user)
+  }
+
+  /**
+   * Profile photo
+   *
+   * @param {object} ctx
+   * @param {AuthSession} ctx.auth
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async uploadProfilePhoto ({ request, response, auth }) {
+    const user = auth.user
+    const validate = {
+      size: '200kb',
+      types: ['image']
+    }
+    request.multipart.file('file', validate, async (file) => {
+      const fileName = `uploads/photos/${use('uuid').v1().replace(/-/g, '')}_${file.clientName}`
+      await Drive.disk('s3').put(fileName, file.stream)
+      if (user.profile_photo) {
+        try {
+          await Drive.delete(user.profile_photo)
+        } catch (error) { }
+      }
+      user.profile_photo = fileName
+      user.profile_photo_url = await Drive.disk('s3').getUrl(fileName)
+      await user.save()
+    })
+
+    await request.multipart.process()
+    return response.apiUpdated(user)
+  }
+
+  /**
+   * Profile video
+   *
+   * @param {object} ctx
+   * @param {AuthSession} ctx.auth
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async uploadProfileVideo ({ request, response, auth }) {
+    const user = auth.user
+    const validate = {
+      size: '200kb',
+      types: ['video']
+    }
+    request.multipart.file('file', validate, async (file) => {
+      const fileName = `uploads/videos/${use('uuid').v1().replace(/-/g, '')}_${file.clientName}`
+      await Drive.disk('s3').put(fileName, file.stream)
+      if (user.profile_video) {
+        try {
+          await Drive.delete(user.profile_video)
+        } catch (error) { }
+      }
+      user.profile_video = fileName
+      user.profile_video_url = await Drive.disk('s3').getUrl(fileName)
+      await user.save()
+    })
+
+    await request.multipart.process()
+    return response.apiUpdated(user)
   }
 }
 
