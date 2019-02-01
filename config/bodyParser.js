@@ -135,7 +135,7 @@ module.exports = {
     */
     processManually: [
       '/api/v1/users/upload-avatar',
-      '/api/v1/users/upload-profile-url',
+      '/api/v1/users/upload-profile-photo',
       '/api/v1/users/upload-profile-video'
     ]
 
