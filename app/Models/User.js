@@ -88,6 +88,14 @@ class User extends Model {
   conversations () {
     return this.hasMany('App/Models/Conversation', '_id', 'user_ids')
   }
+
+  reports () {
+    return this.hasMany('App/Models/Report')
+  }
+
+  reporteds () {
+    return this.hasMany('App/Models/Report', '_id', 'reportee_id')
+  }
 }
 
 module.exports = User
