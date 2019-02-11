@@ -64,8 +64,10 @@ Route.group('user', () => {
    *     responses:
    *       200:
    *         description: user
-   *         schema:
-   *           $ref: '#/components/schemas/User'
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/User'
    *       404:
    *         $ref: '#/components/responses/NotFound'
    */
@@ -90,8 +92,10 @@ Route.group('user', () => {
    *     responses:
    *       202:
    *         description: user
-   *         schema:
-   *           $ref: '#/components/schemas/User'
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/User'
    *       404:
    *         $ref: '#/components/responses/NotFound'
    *       401:

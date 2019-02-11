@@ -27,8 +27,10 @@ Route.group('auth', () => {
    *     responses:
    *       201:
    *         description: user
-   *         schema:
-   *           $ref: '#/components/schemas/User'
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/User'
    *       422:
    *         $ref: '#/components/responses/ValidateFailed'
    */
@@ -59,18 +61,21 @@ Route.group('auth', () => {
    *     responses:
    *       200:
    *         description: login success
-   *         type: object
-   *         properties:
-   *           type:
-   *             type: string
-   *             default: bearer
-   *           token:
-   *             type: string
-   *           refreshToken:
-   *             type: string
-   *           user:
-   *             type: object
-   *             $ref: '#/components/schemas/User'
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 type:
+   *                   type: string
+   *                   default: bearer
+   *                 token:
+   *                   type: string
+   *                 refreshToken:
+   *                   type: string
+   *                 user:
+   *                   type: object
+   *                   $ref: '#/components/schemas/User'
    *       422:
    *         $ref: '#/components/responses/ValidateFailed'
    *       401:
@@ -127,18 +132,21 @@ Route.group('auth', () => {
    *     responses:
    *       200:
    *         description: login success
-   *         type: object
-   *         properties:
-   *           type:
-   *             type: string
-   *             default: bearer xxx
-   *           token:
-   *             type: string
-   *           refreshToken:
-   *             type: string
-   *           user:
-   *             type: object
-   *             $ref: '#/components/schemas/User'
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 type:
+   *                   type: string
+   *                   default: bearer
+   *                 token:
+   *                   type: string
+   *                 refreshToken:
+   *                   type: string
+   *                 user:
+   *                   type: object
+   *                   $ref: '#/components/schemas/User'
    *       422:
    *         $ref: '#/components/responses/ValidateFailed'
    *       401:
@@ -167,15 +175,18 @@ Route.group('auth', () => {
    *     responses:
    *       200:
    *         description: refresh success
-   *         type: object
-   *         properties:
-   *           type:
-   *             type: string
-   *             default: bearer
-   *           token:
-   *             type: string
-   *           refreshToken:
-   *             type: string
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 type:
+   *                   type: string
+   *                   default: bearer
+   *                 token:
+   *                   type: string
+   *                 refreshToken:
+   *                   type: string
    *       401:
    *         $ref: '#/components/responses/Unauthorized'
    */
@@ -191,9 +202,11 @@ Route.group('auth', () => {
    *     summary: Get current user
    *     responses:
    *       200:
-   *         description: response User
-   *         schema:
-   *           $ref: '#/components/schemas/User'
+   *         description: response current User
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/User'
    *       422:
    *         $ref: '#/components/responses/ValidateFailed'
    *       401:
@@ -273,7 +286,7 @@ Route.group('auth', () => {
    *                 required: true
    *     responses:
    *       200:
-   *         description: message
+   *         description: change password success
    *       422:
    *         $ref: '#/components/responses/ValidateFailed'
    *       401:

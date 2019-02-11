@@ -11,7 +11,7 @@ Route.get('api-specs', async ({ request, response }) => {
       openapi: '3.0.0',
       info: {
         title: 'YOTO REST API', // Title (required)
-        version: '1.0.0' // Version (required)
+        version: '1.0' // Version (required)
       },
       servers: [
         { url: `/api/v1` }
@@ -80,54 +80,62 @@ Route.get('docs', ({ view }) => {
  *   responses:
  *     Unauthorized:
  *       description: JWT token invalid or did not provided
- *       schema:
- *         type: object
- *         properties:
- *           status:
- *             type: number
- *             default: 401
- *           code:
- *             type: string
- *           message:
- *             type: string
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: number
+ *                 default: 401
+ *               code:
+ *                 type: string
+ *               message:
+ *                 type: string
  *     ValidateFailed:
  *       description: Validation failed
- *       schema:
- *         type: object
- *         properties:
- *           status:
- *             type: number
- *             default: 422
- *           code:
- *             type: string
- *           message:
- *             type: string
- *           errors:
- *             type: array
- *             items:
- *               type: object
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: number
+ *                 default: 422
+ *               code:
+ *                 type: string
+ *               message:
+ *                 type: string
+ *               errors:
+ *                 type: array
+ *                 items:
+ *                   type: object
  *     NotFound:
  *       description: Resource not found
- *       schema:
- *         type: object
- *         properties:
- *           status:
- *             type: number
- *             default: 404
- *           code:
- *             type: string
- *           message:
- *             type: string
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: number
+ *                 default: 404
+ *               code:
+ *                 type: string
+ *               message:
+ *                 type: string
  *     Forbidden:
  *       description: Access denied
- *       schema:
- *         type: object
- *         properties:
- *           status:
- *             type: number
- *             default: 403
- *           code:
- *             type: string
- *           message:
- *             type: string
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: number
+ *                 default: 403
+ *               code:
+ *                 type: string
+ *               message:
+ *                 type: string
  */
