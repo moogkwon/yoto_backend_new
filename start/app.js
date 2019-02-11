@@ -28,6 +28,7 @@ const providers = [
   'adonis-websocket/providers/WsProvider',
   'lucid-mongo/providers/LucidMongoProvider',
   'adonis-guard/providers/GuardProvider',
+  Helpers.appRoot('app/Providers/FirebaseProvider'),
   Helpers.appRoot('app/Providers/ExtendValidatorProvider'),
   Helpers.appRoot('app/Providers/ExtendResponseProvider'),
   Helpers.appRoot('app/Providers/BindInstanceProvider')
@@ -73,7 +74,8 @@ const aliases = {
 |
 */
 const commands = [
-  'App/Commands/Swagger'
+  'App/Commands/Swagger',
+  'App/Commands/SendNotification'
 ]
 
 module.exports = { providers, aceProviders, aliases, commands }

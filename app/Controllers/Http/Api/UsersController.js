@@ -84,7 +84,19 @@ class UsersController extends BaseController {
     if (String(auth.user._id) !== String(user._id)) {
       throw UnAuthorizeException.invoke()
     }
-    user.merge(request.only(['name', 'locale']))
+    user.merge(request.only([
+      'first_name',
+      'last_name',
+      'instagram',
+      'birth_year',
+      'gender',
+      'birth_year',
+      'lgbtq',
+      'location_country',
+      'location_country_code',
+      'location_state',
+      'location_city'
+    ]))
     await user.save()
     return response.apiUpdated(user)
   }

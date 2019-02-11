@@ -12,12 +12,10 @@ const Model = use('Model')
  *   schemas:
  *     NewUser:
  *       type: object
- *       required:
- *         - name
- *         - email
- *         - password
  *       properties:
- *         name:
+ *         first_name:
+ *           type: string
+ *         last_name:
  *           type: string
  *         email:
  *           type: string
@@ -29,11 +27,35 @@ const Model = use('Model')
  *     UpdateUser:
  *       type: object
  *       properties:
- *         name:
+ *         instagram:
+ *           type: string
+ *         birth_year:
+ *           type: number
+ *           min: 1990
+ *         gender:
+ *           type: string
+ *           enum: ['male', 'female']
+ *         lgbtq:
+ *           type: boolean
+ *         location:
+ *           type: object
+ *           properties:
+ *             latitude:
+ *               type: number
+ *             longitude:
+ *               type: number
+ *         location_country:
+ *           type: string
+ *         location_country_code:
+ *           type: string
+ *         location_state:
+ *           type: string
+ *         location_city:
  *           type: string
  *     User:
  *       allOf:
  *         - $ref: '#/components/schemas/NewUser'
+ *         - $ref: '#/components/schemas/UpdateUser'
  *         - type: object
  *           properties:
  *             _id:
@@ -99,6 +121,10 @@ class User extends Model {
 
   reporteds () {
     return this.hasMany('App/Models/Report', '_id', 'reportee_id')
+  }
+
+  device () {
+    return this.hasOne('App/Models/Device')
   }
 }
 
