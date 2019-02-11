@@ -21,11 +21,13 @@ Route.group('user', () => {
    *       - $ref: '#/components/parameters/ListQuery'
    *     responses:
    *       200:
-   *         description: users
-   *         schema:
-   *           type: array
-   *           items:
-   *               $ref: '#/components/schemas/User'
+   *         description: friends
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                   $ref: '#/components/schemas/User'
    */
   Route.get('/', 'Api/UsersController.index')
     .middleware(['auth:jwt', 'can:isAdmin'])

@@ -22,10 +22,12 @@ Route.group('report', () => {
    *     responses:
    *       200:
    *         description: reports
-   *         schema:
-   *           type: array
-   *           items:
-   *               $ref: '#/components/schemas/Report'
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: array
+   *               items:
+   *                   $ref: '#/components/schemas/Report'
    */
   Route.get('/', 'Api/ReportsController.index')
     .middleware(['auth:jwt', 'can:isAdmin'])

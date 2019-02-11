@@ -118,7 +118,7 @@ class UsersController extends BaseController {
     const socketId = await Redis.hget(`users`, String(this.user._id))
     const socket = chatChannel.get(socketId)
     if (socket) {
-      debug('Send block event to user', user._id, socket.socket.id, { message: '' })
+      debug('Outgoing', 'user_blocked', { message: '' })
       socket.socket.toMe().emit('user_blocked', { message: '' })
     }
     return response.apiUpdated(user)

@@ -195,6 +195,8 @@ class ChatController {
         // find and emit calling to other user
         const userId = conversation.user_ids.find(id => String(id) !== String(this.user._id))
         const otherUser = await conversation.users().where({ _id: { $ne: this.user._id } }).first()
+        await this.user.friends().attach(userId)
+        await otherUser.friends().attach(this.user._id)
         const socketid = await Redis.hget('users', userId)
         const socket = chatChannel.get(socketid)
         if (socket) {

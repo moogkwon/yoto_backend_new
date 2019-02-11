@@ -89,6 +89,10 @@ class User extends Model {
     return this.hasMany('App/Models/Conversation', '_id', 'user_ids')
   }
 
+  friends () {
+    return this.referMany('App/Models/User', '_id', 'friend_ids')
+  }
+
   reports () {
     return this.hasMany('App/Models/Report')
   }
