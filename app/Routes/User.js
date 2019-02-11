@@ -116,7 +116,7 @@ Route.group('user', () => {
    *   delete:
    *     tags:
    *       - User
-   *     summary: Delete users
+   *     summary: Delete user
    *     parameters:
    *       - $ref: '#/components/parameters/Id'
    *     responses:
@@ -128,7 +128,49 @@ Route.group('user', () => {
    *         $ref: '#/components/responses/Unauthorized'
    */
   Route.delete('/:id', 'Api/UsersController.destroy')
-    .middleware(['auth:jwt'])
+    .middleware(['auth:jwt', 'can:isAdmin'])
+    .instance('App/Models/User')
+
+  /**
+   * @swagger
+   * /users/{id}/block:
+   *   put:
+   *     tags:
+   *       - User
+   *     summary: Block user
+   *     parameters:
+   *       - $ref: '#/components/parameters/Id'
+   *     responses:
+   *       202:
+   *         description: block success
+   *       404:
+   *         $ref: '#/components/responses/NotFound'
+   *       401:
+   *         $ref: '#/components/responses/Unauthorized'
+   */
+  Route.put('/:id/block', 'Api/UsersController.block')
+    .middleware(['auth:jwt', 'can:isAdmin'])
+    .instance('App/Models/User')
+
+  /**
+   * @swagger
+   * /users/{id}/reject:
+   *   put:
+   *     tags:
+   *       - User
+   *     summary: Reject user user profile video/photo
+   *     parameters:
+   *       - $ref: '#/components/parameters/Id'
+   *     responses:
+   *       202:
+   *         description: reject success
+   *       404:
+   *         $ref: '#/components/responses/NotFound'
+   *       401:
+   *         $ref: '#/components/responses/Unauthorized'
+   */
+  Route.put('/:id/reject', 'Api/UsersController.reject')
+    .middleware(['auth:jwt', 'can:isAdmin'])
     .instance('App/Models/User')
 
   /**

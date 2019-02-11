@@ -9,6 +9,9 @@ const User = use('App/Models/User')
 const UnAuthorizeException = use('App/Exceptions/UnAuthorizeException')
 // const Config = use('Config')
 const Drive = use('Drive')
+const debug = require('debug')('socket')
+const Ws = use('Ws')
+const Redis = use('Redis')
 
 /**
  *
@@ -96,11 +99,64 @@ class UsersController extends BaseController {
    */
   async destroy ({ request, response, instance, auth }) {
     const user = instance
-    if (String(auth.user._id) !== String(user._id)) {
-      throw UnAuthorizeException.invoke()
-    }
     await user.delete()
     return response.apiDeleted()
+  }
+
+  /**
+   * Block
+   *
+   * @param {object} ctx
+   * @param {AuthSession} ctx.auth
+   * @param {Request} ctx.request
+   */
+  async block ({ request, response, params, instance, auth }) {
+    const user = instance
+    user.is_blocked = true
+    await user.save()
+    const chatChannel = Ws.channel('/chat')
+    const socketId = await Redis.hget(`users`, String(this.user._id))
+    const socket = chatChannel.get(socketId)
+    if (socket) {
+      debug('Send block event to user', user._id, socket.socket.id, { message: '' })
+      socket.socket.toMe().emit('user_blocked', { message: '' })
+    }
+    return response.apiUpdated(user)
+  }
+
+  /**
+   * Unblock
+   *
+   * @param {object} ctx
+   * @param {AuthSession} ctx.auth
+   * @param {Request} ctx.request
+   */
+  async unblock ({ request, response, params, instance, auth }) {
+    const user = instance
+    user.is_blocked = false
+    await user.save()
+    return response.apiUpdated(user)
+  }
+
+  /**
+   * Reject
+   *
+   * @param {object} ctx
+   * @param {AuthSession} ctx.auth
+   * @param {Request} ctx.request
+   */
+  async reject ({ request, response, params, instance, auth }) {
+    const user = instance
+    user.profile_rejected = true
+    await user.save()
+    const chatChannel = Ws.channel('/chat')
+    const socketId = await Redis.hget(`users`, String(this.user._id))
+    const socket = chatChannel.get(socketId)
+    if (socket) {
+      debug('Send reject event to user', user._id, socket.socket.id, { message: '' })
+      socket.socket.toMe().emit('user_profile_rejected', { message: '' })
+    }
+    return response.apiUpdated(user)
   }
 
   /**
