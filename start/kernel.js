@@ -16,6 +16,7 @@ const globalMiddleware = [
   'Adonis/Middleware/Session',
   'Adonis/Middleware/Shield',
   'Adonis/Middleware/AuthInit',
+  'Adonis/Middleware/GuardInit',
   'App/Middleware/DecodeQuery'
 ]
 
@@ -37,7 +38,8 @@ const globalMiddleware = [
 |
 */
 const namedMiddleware = {
-  auth: 'Adonis/Middleware/Auth'
+  auth: 'Adonis/Middleware/Auth',
+  can: 'App/Middleware/Can'
   // instance: 'App/Middleware/Instance'
 }
 

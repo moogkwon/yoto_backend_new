@@ -11,7 +11,7 @@ const Route = use('Route')
 
 Route.group('user', () => {
   /**
-   * @\swagger
+   * @swagger
    * /users:
    *   get:
    *     tags:
@@ -27,7 +27,8 @@ Route.group('user', () => {
    *           items:
    *               $ref: '#/components/schemas/User'
    */
-  // Route.get('/', 'Api/UsersController.index')
+  Route.get('/', 'Api/UsersController.index')
+    .middleware(['auth:jwt', 'can:isAdmin'])
 
   /**
    * \@swagger

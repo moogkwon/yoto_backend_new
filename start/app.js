@@ -27,6 +27,7 @@ const providers = [
   '@adonisjs/drive/providers/DriveProvider',
   'adonis-websocket/providers/WsProvider',
   'lucid-mongo/providers/LucidMongoProvider',
+  'adonis-guard/providers/GuardProvider',
   Helpers.appRoot('app/Providers/ExtendValidatorProvider'),
   Helpers.appRoot('app/Providers/ExtendResponseProvider'),
   Helpers.appRoot('app/Providers/BindInstanceProvider')

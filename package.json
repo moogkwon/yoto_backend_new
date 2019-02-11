@@ -33,6 +33,7 @@
     "@adonisjs/validator": "^5.0.6",
     "@adonisjs/vow": "^1.0.17",
     "@adonisjs/vow-browser": "^1.0.7",
+    "adonis-guard": "^1.0.0-beta.5",
     "adonis-websocket": "github:duyluonglc/adonis-websocket",
     "aws-sdk": "^2.395.0",
     "lodash": "^4.17.11",
