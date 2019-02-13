@@ -156,6 +156,27 @@ Route.group('user', () => {
 
   /**
    * @swagger
+   * /users/{id}/unblock:
+   *   put:
+   *     tags:
+   *       - User
+   *     summary: Unblock user
+   *     parameters:
+   *       - $ref: '#/components/parameters/Id'
+   *     responses:
+   *       202:
+   *         description: unblock success
+   *       404:
+   *         $ref: '#/components/responses/NotFound'
+   *       401:
+   *         $ref: '#/components/responses/Unauthorized'
+   */
+  Route.put('/:id/unblock', 'Api/UsersController.unblock')
+    .middleware(['auth:jwt', 'can:isAdmin'])
+    .instance('App/Models/User')
+
+  /**
+   * @swagger
    * /users/{id}/reject:
    *   put:
    *     tags:

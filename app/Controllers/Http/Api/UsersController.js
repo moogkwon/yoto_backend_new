@@ -127,7 +127,7 @@ class UsersController extends BaseController {
     user.is_blocked = true
     await user.save()
     const chatChannel = Ws.channel('/chat')
-    const socketId = await Redis.hget(`users`, String(this.user._id))
+    const socketId = await Redis.hget(`users`, String(user._id))
     const socket = chatChannel.get(socketId)
     if (socket) {
       debug('Outgoing', 'user_blocked', { message: '' })
@@ -162,7 +162,7 @@ class UsersController extends BaseController {
     user.profile_rejected = true
     await user.save()
     const chatChannel = Ws.channel('/chat')
-    const socketId = await Redis.hget(`users`, String(this.user._id))
+    const socketId = await Redis.hget(`users`, String(user._id))
     const socket = chatChannel.get(socketId)
     if (socket) {
       debug('Send reject event to user', user._id, socket.socket.id, { message: '' })
