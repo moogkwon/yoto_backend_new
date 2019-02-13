@@ -13,7 +13,6 @@ const Mail = use('Mail')
 const crypto = require('crypto')
 const uuid = require('uuid')
 const User = use('App/Models/User')
-const Drive = use('Drive')
 
 class AuthController extends BaseController {
   /**
@@ -28,7 +27,21 @@ class AuthController extends BaseController {
    *
    */
   async register ({ request, response }) {
-    const user = new User(request.only(['name', 'email', 'password', 'locale']))
+    const user = new User(request.only([
+      'email',
+      'password',
+      'first_name',
+      'last_name',
+      'instagram',
+      'birth_year',
+      'gender',
+      'birth_year',
+      'lgbtq',
+      'location_country',
+      'location_country_code',
+      'location_state',
+      'location_city'
+    ]))
     const verificationToken = crypto.createHash('sha256').update(uuid.v4()).digest('hex')
     user.merge({
       verificationToken,
@@ -132,10 +145,17 @@ class AuthController extends BaseController {
       console.log(error)
       throw LoginFailedException.invoke('Invalid token')
     }
-    let user = null
-    user = await User.findOrCreate({ social_id: socialUser.getId() }, {
-      name: socialUser.getName(),
-      email: socialUser.getEmail(),
+    let firstName = ''
+    let lastName = ''
+    const name = socialUser.getName()
+    if (name) {
+      firstName = name.split(' ')[0]
+      lastName = name.split(' ')[1]
+    }
+    let user = await User.findOrCreate({ social_id: socialUser.getId() }, {
+      first_name: firstName,
+      last_name: lastName,
+      email: socialUser.getEmail() || '',
       verified: true,
       social_id: socialUser.getId(),
       password: use('uuid').v4(),
