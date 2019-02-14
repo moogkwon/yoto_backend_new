@@ -32,7 +32,7 @@ const photos = [
 
 Factory.blueprint('App/Models/User', (faker) => {
   const profile = faker.bool()
-    ? { profile_photo_url: faker.pickOne(photos) }
+    ? { profile_photo_url: faker.pickone(photos) }
     : { profile_video_url: 'https://media.w3.org/2010/05/sintel/trailer_hd.mp4' }
 
   return {
@@ -52,7 +52,7 @@ Factory.blueprint('App/Models/User', (faker) => {
     location_country_code: faker.country(),
     location_state: faker.state({ full: true }),
     location_city: faker.city(),
-    avatar_url: faker.pickOne(photos),
+    avatar_url: faker.pickone(photos),
     ...profile
   }
 })
