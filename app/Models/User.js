@@ -27,6 +27,10 @@ const Model = use('Model')
  *     UpdateUser:
  *       type: object
  *       properties:
+ *         first_name:
+ *           type: string
+ *         last_name:
+ *           type: string
  *         instagram:
  *           type: string
  *         birth_year:
@@ -58,6 +62,8 @@ const Model = use('Model')
  *         - $ref: '#/components/schemas/UpdateUser'
  *         - type: object
  *           properties:
+ *             name:
+ *               type: string
  *             _id:
  *               type: string
  *             avatar_url:
@@ -83,6 +89,9 @@ class User extends Model {
     this.addHook('beforeSave', async (userInstance) => {
       if (userInstance.dirty.password) {
         userInstance.password = await Hash.make(userInstance.password)
+      }
+      if (userInstance.dirty.first_name || userInstance.dirty.last_name) {
+        userInstance.name = `${userInstance.dirty.first_name} ${userInstance.dirty.last_name}`
       }
     })
   }
