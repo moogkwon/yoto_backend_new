@@ -160,6 +160,8 @@ class UsersController extends BaseController {
   async reject ({ request, response, params, instance, auth }) {
     const user = instance
     user.profile_rejected = true
+    user.profile_video_url = null
+    user.profile_photo_url = null
     await user.save()
     const chatChannel = Ws.channel('/chat')
     const socketId = await Redis.hget(`users`, String(user._id))
