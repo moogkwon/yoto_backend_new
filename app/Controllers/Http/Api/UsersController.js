@@ -31,7 +31,7 @@ class UsersController extends BaseController {
     const q = User.query(query)
     if (query.search) {
       q.where({
-        name: { $regex: `/.*${query.search}.*/i` }
+        name: { $regex: new RegExp(`.*${query.search}.*`, 'i') }
       })
     }
     const users = await q.paginate(query.page, query.perPage)
