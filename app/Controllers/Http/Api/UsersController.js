@@ -27,8 +27,15 @@ class UsersController extends BaseController {
    * @param {Response} ctx.response
    */
   async index ({ request, response, decodeQuery }) {
-    const users = await User.query(decodeQuery()).fetch()
-    return response.apiCollection(users)
+    const query = decodeQuery()
+    const q = User.query(query)
+    if (query.search) {
+      q.where({
+        name: { $regex: `/.*${query.search}.*/` }
+      })
+    }
+    const users = await q.paginate(query.page, query.perPage)
+    return response.apiSuccess(users)
   }
 
   /**

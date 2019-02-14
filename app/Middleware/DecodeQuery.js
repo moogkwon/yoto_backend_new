@@ -16,7 +16,7 @@ class DecodeQuery {
       query.where = query.where || {}
       // let includes = query.with || []
       // query.with = includes
-      return _.pick(query, ['select', 'skip', 'limit', 'where', 'sort', 'with'])
+      return _.pick(query, ['select', 'skip', 'limit', 'where', 'sort', 'with', 'search', 'perPage', 'page'])
     }
     // await next to pass the request to next middleware or controller
     await next()
