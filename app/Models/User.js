@@ -64,7 +64,7 @@ const Model = use('Model')
  *               type: string
  *             profile_photo_url:
  *               type: string
- *             video_photo_url:
+ *             profile_video_url:
  *               type: string
  *             profile_rejected:
  *               type: boolean
