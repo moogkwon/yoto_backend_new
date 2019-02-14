@@ -228,6 +228,7 @@ class UsersController extends BaseController {
       }
       user.profile_photo = fileName
       user.profile_photo_url = await Drive.disk('s3').getUrl(fileName)
+      user.profile_video_url = null
       await user.save()
     })
 
@@ -259,6 +260,7 @@ class UsersController extends BaseController {
       }
       user.profile_video = fileName
       user.profile_video_url = await Drive.disk('s3').getUrl(fileName)
+      user.profile_photo_url = null
       await user.save()
     })
 
