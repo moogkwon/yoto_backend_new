@@ -9,6 +9,7 @@ const Report = use('App/Models/Report')
 const User = use('App/Models/User')
 // const Validator = use('Validator')
 const UnAuthorizeException = use('App/Exceptions/UnAuthorizeException')
+const ValidateErrorException = use('App/Exceptions/ValidateErrorException')
 // const Config = use('Config')
 const Drive = use('Drive')
 
@@ -26,7 +27,17 @@ class ReportsController extends BaseController {
    * @param {Response} ctx.response
    */
   async index ({ request, response, decodeQuery }) {
-    const reports = await Report.query(decodeQuery()).fetch()
+    const query = decodeQuery()
+    const q = Report.query(query)
+    if (query.search) {
+      q.where({
+        $or: [
+          { reportee_name: { $regex: new RegExp(`.*${query.search}.*`, 'i') } },
+          { reporter_name: { $regex: new RegExp(`.*${query.search}.*`, 'i') } }
+        ]
+      })
+    }
+    const reports = await q.fetch()
     return response.apiCollection(reports)
   }
 
@@ -48,8 +59,17 @@ class ReportsController extends BaseController {
       types: ['image']
     }
 
-    const report = new Report(request.only('reportee_id', 'reason'))
-    report.user_id = auth.user._id
+    const otherUser = await User.find(request.input('requestee_id'))
+    if (!otherUser) {
+      throw ValidateErrorException.invoke([{ field: 'requestee_id', message: 'User not found' }])
+    }
+
+    const report = new Report({
+      user_id: auth.user._id,
+      user_name: auth.user.name,
+      requestee_id: otherUser.user._id,
+      reportee_name: otherUser.name
+    })
 
     request.multipart.file('file', validate, async (file) => {
       const fileName = `uploads/reports/${use('uuid').v1().replace(/-/g, '')}_${file.clientName}`
@@ -74,7 +94,7 @@ class ReportsController extends BaseController {
    */
   async show ({ request, response, instance, decodeQuery }) {
     const report = instance
-    await report.loadMany('user', 'reportee')
+    await report.loadMany(['user', 'reportee'])
     return response.apiItem(report)
   }
 

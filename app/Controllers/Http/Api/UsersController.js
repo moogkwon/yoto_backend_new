@@ -75,7 +75,7 @@ class UsersController extends BaseController {
    */
   async show ({ request, response, instance, decodeQuery }) {
     const user = instance
-    // await user.related(decodeQuery().with).load()
+    await user.loadMany(decodeQuery().with)
     return response.apiItem(user)
   }
 
