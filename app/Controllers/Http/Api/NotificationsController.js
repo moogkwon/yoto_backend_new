@@ -1,6 +1,6 @@
 'use strict'
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
-/** @typedef {import('@adonisjs/auth/src/Schemes/Session')} AuthSession */
+/** @typedef {import('@adonisjs/auth/src/Schemes/Jwt')} AuthJwt */
 
 const BaseController = require('./BaseController')
 /** @type {typeof import('../../../Models/Notification')} */
@@ -21,7 +21,7 @@ class NotificationsController extends BaseController {
    * Index
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
@@ -34,7 +34,7 @@ class NotificationsController extends BaseController {
    * Store
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
@@ -50,7 +50,7 @@ class NotificationsController extends BaseController {
     ]))
     notification.user_id = auth.user._id
     await notification.save()
-    
+
     return response.apiCreated(notification)
   }
 
@@ -58,7 +58,7 @@ class NotificationsController extends BaseController {
    * Show
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
@@ -72,7 +72,7 @@ class NotificationsController extends BaseController {
    * Destroy
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */

@@ -37,7 +37,7 @@ class Report extends Model {
   }
 
   reportee () {
-    return this.belongsTo('App/Models/User', '_id', 'reportee_id')
+    return this.belongsTo('App/Models/User', 'reportee_id')
   }
 }
 

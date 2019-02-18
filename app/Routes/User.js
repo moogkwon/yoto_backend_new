@@ -78,6 +78,24 @@ Route.group('user', () => {
 
   /**
    * @swagger
+   * /users/{id}/token:
+   *   post:
+   *     tags:
+   *       - User
+   *     summary: Generate token for user
+   *     parameters:
+   *       - $ref: '#/components/parameters/Id'
+   *     responses:
+   *       200:
+   *         description: token
+   *       404:
+   *         $ref: '#/components/responses/NotFound'
+   */
+  Route.post('/:id/token', 'Api/UsersController.token')
+    .instance('App/Models/User')
+
+  /**
+   * @swagger
    * /users/{id}:
    *   put:
    *     tags:

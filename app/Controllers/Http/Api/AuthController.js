@@ -1,5 +1,7 @@
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
+/** @typedef {import('@adonisjs/auth/src/Schemes/Jwt')} AuthJwt */
+
 'use strict'
 const BaseController = require('./BaseController')
 // const AccountNotVerifiedException = use('App/Exceptions/AccountNotVerifiedException')

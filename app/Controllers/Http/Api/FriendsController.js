@@ -1,6 +1,6 @@
 'use strict'
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
-/** @typedef {import('@adonisjs/auth/src/Schemes/Session')} AuthSession */
+/** @typedef {import('@adonisjs/auth/src/Schemes/Jwt')} AuthJwt */
 
 const BaseController = require('./BaseController')
 /** @type {typeof import('../../../Models/User')} */
@@ -22,7 +22,7 @@ class FriendsController extends BaseController {
    * Index
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */

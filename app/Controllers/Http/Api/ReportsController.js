@@ -1,6 +1,6 @@
 'use strict'
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
-/** @typedef {import('@adonisjs/auth/src/Schemes/Session')} AuthSession */
+/** @typedef {import('@adonisjs/auth/src/Schemes/Jwt')} AuthJwt */
 
 const BaseController = require('./BaseController')
 /** @type {typeof import('../../../Models/Report')} */
@@ -22,7 +22,7 @@ class ReportsController extends BaseController {
    * Index
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
@@ -38,49 +38,57 @@ class ReportsController extends BaseController {
       })
     }
     const reports = await q.paginate(query.page, query.perPage)
-    return response.apiSuccess(reports)
+    return response.json(reports)
   }
 
   /**
    * Store
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
   async store ({ request, response, auth }) {
-    await this.validate(request.all(), {
-      requestee_id: 'required|objectId',
-      reason: 'required'
+    const report = new Report({
+      user_id: auth.user._id,
+      user_name: auth.user.name
     })
+
     const validate = {
       size: '200kb',
       types: ['image']
     }
 
-    const otherUser = await User.find(request.input('requestee_id'))
+    const body = {}
+    request.multipart.file('file', validate, async (file) => {
+      if (!file || !file.fieldName) {
+        throw ValidateErrorException.invoke([{ field: 'file', message: 'Field file is required' }])
+      }
+      const fileName = `uploads/reports/${use('uuid').v1().replace(/-/g, '')}_${file.clientName}`
+      await Drive.disk('s3').put(fileName, file.stream)
+      report.file = fileName
+      report.file_url = await Drive.disk('s3').getUrl(fileName)
+    })
+
+    request.multipart.field((name, value) => {
+      body[name] = value
+    })
+    await request.multipart.process()
+    console.log(body)
+    await this.validate(body, {
+      requestee_id: 'required|objectId',
+      reason: 'required'
+    })
+    const otherUser = await User.find(body.requestee_id)
     if (!otherUser) {
       throw ValidateErrorException.invoke([{ field: 'requestee_id', message: 'User not found' }])
     }
 
-    const report = new Report({
-      user_id: auth.user._id,
-      user_name: auth.user.name,
-      requestee_id: otherUser.user._id,
-      reportee_name: otherUser.name
-    })
-
-    request.multipart.file('file', validate, async (file) => {
-      const fileName = `uploads/reports/${use('uuid').v1().replace(/-/g, '')}_${file.clientName}`
-      await Drive.disk('s3').put(fileName, file.stream)
-
-      report.file = fileName
-      report.file_url = await Drive.disk('s3').getUrl(fileName)
-      await report.save()
-    })
-
-    await request.multipart.process()
+    report.reportee_id = otherUser._id
+    report.reportee_name = otherUser.name
+    report.reason = body.reason
+    await report.save()
 
     auth.user.report_count = (auth.user.report_count || 0) + 1
     await auth.user.save()
@@ -94,7 +102,7 @@ class ReportsController extends BaseController {
    * Show
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
@@ -108,7 +116,7 @@ class ReportsController extends BaseController {
    * Destroy
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */

@@ -1,6 +1,6 @@
 'use strict'
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
-/** @typedef {import('@adonisjs/auth/src/Schemes/Session')} AuthSession */
+/** @typedef {import('@adonisjs/auth/src/Schemes/Jwt')} AuthJwt */
 
 const BaseController = require('./BaseController')
 /** @type {typeof import('../../../Models/User')} */
@@ -22,7 +22,7 @@ class UsersController extends BaseController {
    * Index
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
@@ -35,14 +35,14 @@ class UsersController extends BaseController {
       })
     }
     const users = await q.paginate(query.page, query.perPage)
-    return response.apiSuccess(users)
+    return response.json(users)
   }
 
   /**
    * Store
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
@@ -69,7 +69,7 @@ class UsersController extends BaseController {
    * Show
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
@@ -80,10 +80,24 @@ class UsersController extends BaseController {
   }
 
   /**
+   * Show
+   *
+   * @param {object} ctx
+   * @param {AuthJwt} ctx.auth
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async token ({ request, response, instance, auth }) {
+    const user = instance
+    const token = await auth.generate(user)
+    return response.apiSuccess(token)
+  }
+
+  /**
    * Update
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    */
   async update ({ request, response, params, instance, auth }) {
@@ -112,7 +126,7 @@ class UsersController extends BaseController {
    * Destroy
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
@@ -126,7 +140,7 @@ class UsersController extends BaseController {
    * Block
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    */
   async block ({ request, response, params, instance, auth }) {
@@ -147,7 +161,7 @@ class UsersController extends BaseController {
    * Unblock
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    */
   async unblock ({ request, response, params, instance, auth }) {
@@ -161,7 +175,7 @@ class UsersController extends BaseController {
    * Reject
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    */
   async reject ({ request, response, params, instance, auth }) {
@@ -184,7 +198,7 @@ class UsersController extends BaseController {
    * Upload avatar
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
@@ -215,7 +229,7 @@ class UsersController extends BaseController {
    * Profile photo
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
@@ -247,7 +261,7 @@ class UsersController extends BaseController {
    * Profile video
    *
    * @param {object} ctx
-   * @param {AuthSession} ctx.auth
+   * @param {AuthJwt} ctx.auth
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
