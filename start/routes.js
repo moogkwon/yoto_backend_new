@@ -14,9 +14,21 @@
 */
 /** @type {import('@adonisjs/framework/src/Route/Manager'} */
 const Route = use('Route')
+const Helpers = use('Helpers')
+const readFile = Helpers.promisify(require('fs').readFile)
 
-Route.get('/', ({ request }) => {
-  return { greeting: 'Hello world in JSON' }
-})
+// Route.get('/', ({ request }) => {
+//   return { greeting: 'Hello world in JSON' }
+// })
 
 use('require-all')(`${use('Helpers').appRoot()}/app/Routes`)
+
+Route.any('*', async ({ response }) => {
+  try {
+    const bundle = Helpers.publicPath('bundle.html')
+    const html = await readFile(bundle, 'utf8')
+    response.safeHeader('Cache-Control', 'no-cache').send(html)
+  } catch (error) {
+    return 'Put react bundle to public directory'
+  }
+})
