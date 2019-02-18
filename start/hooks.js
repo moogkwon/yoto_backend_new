@@ -45,6 +45,10 @@ const matchStart = async () => {
         debug('Outgoing', 'match_new', user1._id, socket1.socket.id)
         socket2.socket.toMe().emit('match_new', { conversation_id: conversation._id, user: user1.toJSON() })
         debug('Outgoing', 'match_new', user2._id, socket2.socket.id)
+        user1.conversation_count = (user1.conversation_count || 0) + 1
+        user2.conversation_count = (user2.conversation_count || 0) + 1
+        await user1.save()
+        await user2.save()
       } else {
         unSuccessUserIds.push(userId1)
         unSuccessUserIds.push(userId2)

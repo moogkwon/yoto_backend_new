@@ -4,6 +4,7 @@ const debug = require('debug')('socket')
 const Ws = use('Ws')
 const Redis = use('Redis')
 const _ = require('lodash')
+const User = use('App/Models/User')
 
 class ChatController {
   /**
@@ -124,6 +125,7 @@ class ChatController {
         conversation.status = 'calling'
         // find and emit calling to other user
         const userId = conversation.user_ids.find(id => String(id) !== String(this.user._id))
+        const otherUser = await User.find(userId)
         const socketid = await Redis.hget('users', userId)
         const socket = chatChannel.get(socketid)
         if (socket) {
@@ -152,9 +154,13 @@ class ChatController {
           user_id: userId,
           message: 'prepare to call'
         })
+        this.user.call_count = (this.user.call_count || 0) + 1
+        otherUser.call_count = (otherUser.call_count || 0) + 1
+        await this.user.save()
+        await otherUser.save()
       } else {
-        this.socket.toMe().emit('message', { message: 'you accepted match, waiting for other user accept/next' })
-        debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you accepted match, waiting for other user accept/next' })
+        this.socket.toMe().emit('message', { message: 'you accepted match, but other user is not connecting :( wait for a few second' })
+        debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you accepted match, but other user is not connecting :( wait for a few second' })
       }
       await conversation.save()
     } else {
