@@ -81,6 +81,12 @@ class ReportsController extends BaseController {
     })
 
     await request.multipart.process()
+
+    auth.user.report_count = (auth.user.report_count || 0) + 1
+    await auth.user.save()
+    otherUser.reported_count = (otherUser.reported_count || 0) + 1
+    await otherUser.save()
+
     return response.apiCreated(report)
   }
 
