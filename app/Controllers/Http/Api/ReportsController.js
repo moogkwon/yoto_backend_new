@@ -37,8 +37,8 @@ class ReportsController extends BaseController {
         ]
       })
     }
-    const reports = await q.fetch()
-    return response.apiCollection(reports)
+    const reports = await q.paginate(query.page, query.perPage)
+    return response.apiSuccess(reports)
   }
 
   /**
