@@ -93,6 +93,7 @@ Route.group('user', () => {
    */
   Route.post('/:id/token', 'Api/UsersController.token')
     .instance('App/Models/User')
+    .middleware(['auth:jwt', 'can:isAdmin'])
 
   /**
    * @swagger
