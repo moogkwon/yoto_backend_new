@@ -25,7 +25,7 @@ use('require-all')(`${use('Helpers').appRoot()}/app/Routes`)
 
 Route.any('*', async ({ response }) => {
   try {
-    const bundle = Helpers.publicPath('bundle.html')
+    const bundle = Helpers.publicPath('index.html')
     const html = await readFile(bundle, 'utf8')
     response.safeHeader('Cache-Control', 'no-cache').send(html)
   } catch (error) {
