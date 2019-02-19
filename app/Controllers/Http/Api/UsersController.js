@@ -158,6 +158,7 @@ class UsersController extends BaseController {
     await user.reports().delete()
     await user.reporteds().delete()
     await user.devices().delete()
+    await user.conversations().delete()
     await user.delete()
     return response.apiDeleted()
   }
