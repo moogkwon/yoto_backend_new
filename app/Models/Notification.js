@@ -53,12 +53,16 @@ class Notification extends Model {
     super.boot()
   }
 
-  static get ndates () {
+  static get dates () {
     return [...super.dates, 'send_time']
   }
 
+  static get objectIDs () {
+    return [...super.objectIDs, 'user_ids']
+  }
+
   users () {
-    return this.belongsToMany('App/Models/User')
+    return this.referMany('App/Models/User')
   }
 }
 

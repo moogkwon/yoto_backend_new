@@ -76,6 +76,8 @@ const Model = use('Model')
  *               type: boolean
  *             is_blocked:
  *               type: boolean
+ *             is_online:
+ *               type: boolean
  */
 
 class User extends Model {

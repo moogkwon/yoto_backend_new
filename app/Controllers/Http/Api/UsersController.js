@@ -39,6 +39,29 @@ class UsersController extends BaseController {
   }
 
   /**
+   * count
+   *
+   * @param {object} ctx
+   * @param {AuthJwt} ctx.auth
+   * @param {Request} ctx.request
+   * @param {Response} ctx.response
+   */
+  async count ({ request, response, decodeQuery }) {
+    const query = decodeQuery()
+    const q = User.query(query)
+    if (query.search) {
+      q.where({
+        $or: [
+          { title: { $regex: new RegExp(`.*${query.search}.*`, 'i') } },
+          { content: { $regex: new RegExp(`.*${query.search}.*`, 'i') } }
+        ]
+      })
+    }
+    const userCount = await q.count()
+    return response.apiSuccess({ userCount })
+  }
+
+  /**
    * Store
    *
    * @param {object} ctx

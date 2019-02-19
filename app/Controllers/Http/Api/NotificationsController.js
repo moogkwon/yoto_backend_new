@@ -11,6 +11,7 @@ const User = use('App/Models/User')
 const UnAuthorizeException = use('App/Exceptions/UnAuthorizeException')
 // const Config = use('Config')
 const Drive = use('Drive')
+const moment = require('moment')
 
 /**
  *
@@ -26,8 +27,18 @@ class NotificationsController extends BaseController {
    * @param {Response} ctx.response
    */
   async index ({ request, response, decodeQuery }) {
-    const notifications = await Notification.query(decodeQuery()).fetch()
-    return response.apiCollection(notifications)
+    const query = decodeQuery()
+    const q = Notification.query(query)
+    if (query.search) {
+      q.where({
+        $or: [
+          { title: { $regex: new RegExp(`.*${query.search}.*`, 'i') } },
+          { content: { $regex: new RegExp(`.*${query.search}.*`, 'i') } }
+        ]
+      })
+    }
+    const notifications = await q.paginate(query.page, query.perPage)
+    return response.json(notifications)
   }
 
   /**
@@ -41,14 +52,25 @@ class NotificationsController extends BaseController {
   async store ({ request, response, auth }) {
     await this.validate(request.all(), {
       title: 'required',
-      content: 'required'
+      content: 'required',
+      send_time: 'date'
     })
 
     const notification = new Notification(request.only([
       'title',
-      'content'
+      'content',
+      'send_time',
+      'activity',
+      'country',
+      'gender',
+      'lgbtq',
+      'birth_year_min',
+      'birth_year_max',
+      'user_ids'
     ]))
     notification.user_id = auth.user._id
+    notification.status = 'waiting'
+    notification.send_time = request.input('send_time') || moment()
     await notification.save()
 
     return response.apiCreated(notification)

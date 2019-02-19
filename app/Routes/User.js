@@ -33,6 +33,22 @@ Route.group('user', () => {
     .middleware(['auth:jwt', 'can:isAdmin'])
 
   /**
+   * @swagger
+   * /users/count:
+   *   get:
+   *     tags:
+   *       - User
+   *     summary: Get count user
+   *     parameters:
+   *       - $ref: '#/components/parameters/ListQuery'
+   *     responses:
+   *       200:
+   *         description:  userCount
+   */
+  Route.get('/count', 'Api/UsersController.count')
+    .middleware(['auth:jwt', 'can:isAdmin'])
+
+  /**
    * \@swagger
    * /users:
    *   post:
