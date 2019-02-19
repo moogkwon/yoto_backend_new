@@ -137,8 +137,8 @@ class AuthController extends BaseController {
   async socialLogin ({ request, response, auth, ally, params }) {
     const social = params.social
     await this.validate({ social }, { social: 'required|in:facebook,google' })
-    await this.validate(request.all(), { socialToken: 'required|string' })
-    const socialToken = request.input('socialToken')
+    await this.validate(request.all(), { social_token: 'required|string' })
+    const socialToken = request.input('social_token')
     let clientSecret = Config.get('services.ally')[social].clientSecret
     let socialUser = null
     try {
@@ -159,6 +159,8 @@ class AuthController extends BaseController {
       last_name: lastName,
       email: socialUser.getEmail() || '',
       verified: true,
+      social: social,
+      social_token: socialToken,
       social_id: socialUser.getId(),
       password: use('uuid').v4(),
       avatar_url: socialUser.getAvatar()

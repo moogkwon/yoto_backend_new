@@ -72,6 +72,10 @@ const Model = use('Model')
  *               type: string
  *             profile_video_url:
  *               type: string
+ *             social_id:
+ *               type: string
+ *             social:
+ *               type: string
  *             profile_rejected:
  *               type: boolean
  *             is_blocked:
