@@ -5,6 +5,7 @@ const Ws = use('Ws')
 const Redis = use('Redis')
 const _ = require('lodash')
 const User = use('App/Models/User')
+const moment = require('moment')
 
 class ChatController {
   /**
@@ -53,6 +54,8 @@ class ChatController {
       this.socket.toMe().emit('match_exists', { conversation_id: conversation._id })
       debug('Outgoing', 'match_exists', this.user._id, this.socket.id)
     }
+    this.user.is_online = true
+    await this.user.save()
   }
 
   async on_hunting_start () { // eslint-disable-line
@@ -123,6 +126,7 @@ class ChatController {
       if (_.size(conversation.accepts) === 2) {
         // change conversation state
         conversation.status = 'calling'
+        conversation.start_at = moment()
         // find and emit calling to other user
         const userId = conversation.user_ids.find(id => String(id) !== String(this.user._id))
         const otherUser = await User.find(userId)
@@ -259,6 +263,8 @@ class ChatController {
       debug('Outgoing', 'call_hangup', { conversation_id: conversation._id, message: 'you hungup' })
       await Redis.sadd('hunting', String(this.user._id))
       conversation.status = 'closed'
+      conversation.end_at = moment()
+      conversation.call_time = moment().diff(conversation.start_at)
       await conversation.save()
     } else {
       this.socket.toMe().emit('message', { message: 'you are not in calling' })
@@ -286,6 +292,8 @@ class ChatController {
       }
       await Redis.hdel('users', this.user._id)
       await Redis.srem('hunting', this.user._id)
+      this.user.is_online = false
+      await this.user.save()
     }
   }
 }

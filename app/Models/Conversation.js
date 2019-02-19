@@ -22,6 +22,12 @@ const Model = use('Model')
  *           properties:
  *             _id:
  *               type: string
+ *             start_at:
+ *               type: string
+ *               format: date
+ *             end_at:
+ *               type: string
+ *               format: date
  *             status:
  *               type: string
  *               enum: [waiting, calling, ended]
@@ -35,6 +41,8 @@ class Conversation extends Model {
   }
 
   static get objectIDs () { return ['_id', 'user_id', 'user_ids'] }
+
+  static get dates () { return [...super.dates, 'start_at', 'end_at'] }
 
   users () {
     return this.referMany('App/Models/User')
