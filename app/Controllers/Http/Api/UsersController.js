@@ -155,6 +155,9 @@ class UsersController extends BaseController {
    */
   async destroy ({ request, response, instance, auth }) {
     const user = instance
+    await user.reports().delete()
+    await user.reporteds().delete()
+    await user.devices().delete()
     await user.delete()
     return response.apiDeleted()
   }
