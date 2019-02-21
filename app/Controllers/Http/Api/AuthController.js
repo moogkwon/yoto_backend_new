@@ -168,7 +168,7 @@ class AuthController extends BaseController {
       profile_rejected: false,
       is_online: false
     })
-    const data = await auth.authenticator('jwt').generate(user)
+    const data = await auth.authenticator('jwt').withRefreshToken().generate(user)
     data.data = user
     return response.json(data)
   }
