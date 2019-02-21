@@ -76,15 +76,15 @@ class AuthController extends BaseController {
     let data = null
     try {
       data = await auth.authenticator('jwt').withRefreshToken().attempt(email, password)
-      data.user = await User.findBy({ email })
+      data.data = await User.findBy({ email })
     } catch (error) {
       console.log(error)
       throw LoginFailedException.invoke('Invalid email or password')
     }
-    if (!data.user.verified) {
+    if (!data.data.verified) {
       // throw AccountNotVerifiedException.invoke('Email is not verified')
     }
-    response.apiSuccess(data)
+    response.json(data)
   }
 
   /**
@@ -169,8 +169,8 @@ class AuthController extends BaseController {
       is_online: false
     })
     const data = await auth.authenticator('jwt').generate(user)
-    data.user = user
-    return response.apiSuccess(data)
+    data.data = user
+    return response.json(data)
   }
 
   /**
