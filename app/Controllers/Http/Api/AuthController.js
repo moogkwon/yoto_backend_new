@@ -149,12 +149,12 @@ class AuthController extends BaseController {
     }
     let firstName = ''
     let lastName = ''
-    const name = socialUser.getName()
+    const name = socialUser.getName() || ''
     if (name) {
-      firstName = name.split(' ')[0]
-      lastName = name.split(' ')[1]
+      firstName = name.split(' ')[0] || ''
+      lastName = name.split(' ')[1] || ''
     }
-    let user = await User.findOrCreate({ social_id: socialUser.getId() }, {
+    let user = await User.findOrCreate({ social_id: socialUser.getId(), social }, {
       first_name: firstName,
       last_name: lastName,
       email: socialUser.getEmail() || '',
@@ -163,7 +163,10 @@ class AuthController extends BaseController {
       social_token: socialToken,
       social_id: socialUser.getId(),
       password: use('uuid').v4(),
-      avatar_url: socialUser.getAvatar()
+      avatar_url: socialUser.getAvatar(),
+      is_blocked: false,
+      profile_rejected: false,
+      is_online: false
     })
     const data = await auth.authenticator('jwt').generate(user)
     data.user = user
