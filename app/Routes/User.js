@@ -125,7 +125,7 @@ Route.group('user', () => {
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/NewUser'
+   *             $ref: '#/components/schemas/UpdateUser'
    *     responses:
    *       202:
    *         description: user
