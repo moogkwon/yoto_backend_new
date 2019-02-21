@@ -295,7 +295,7 @@ class UsersController extends BaseController {
   async uploadProfileVideo ({ request, response, auth }) {
     const user = auth.user
     const validate = {
-      size: '200kb',
+      size: '1mb',
       types: ['video']
     }
     request.multipart.file('file', validate, async (file) => {
