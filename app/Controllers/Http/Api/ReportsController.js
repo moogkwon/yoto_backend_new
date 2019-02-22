@@ -75,10 +75,9 @@ class ReportsController extends BaseController {
       body[name] = value
     })
     await request.multipart.process()
-    console.log(body)
     await this.validate(body, {
       requestee_id: 'required|objectId',
-      reason: 'required'
+      reason: 'required|in:nude,mean,inappropriate,other'
     })
     const otherUser = await User.find(body.requestee_id)
     if (!otherUser) {
@@ -93,6 +92,15 @@ class ReportsController extends BaseController {
     auth.user.report_count = (auth.user.report_count || 0) + 1
     await auth.user.save()
     otherUser.reported_count = (otherUser.reported_count || 0) + 1
+    if (report.reason === 'nude') {
+      otherUser.reported_nude = (otherUser.reported_nude || 0) + 1
+    } else if (report.reason === 'mean') {
+      otherUser.reported_mean = (otherUser.reported_mean || 0) + 1
+    } else if (report.reason === 'nude') {
+      otherUser.reported_inappropriate = (otherUser.reported_inappropriate || 0) + 1
+    } else {
+      otherUser.reported_other = (otherUser.reported_other || 0) + 1
+    }
     await otherUser.save()
 
     return response.apiCreated(report)
