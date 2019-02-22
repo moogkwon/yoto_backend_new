@@ -29,6 +29,6 @@ Route.any('*', async ({ response }) => {
     const html = await readFile(bundle, 'utf8')
     response.safeHeader('Cache-Control', 'no-cache').send(html)
   } catch (error) {
-    return 'Put react bundle to public directory'
+    return response.status(404).json({ message: 'URL not found' })
   }
 })

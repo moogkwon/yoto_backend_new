@@ -13,3 +13,6 @@ Ws.named(namedMiddlewareWs)
 
 Ws.channel('/chat', 'ChatController')
   .middleware('auth:jwt')
+
+Ws.channel('/summary', 'SummaryController')
+  .middleware('auth:jwt')
