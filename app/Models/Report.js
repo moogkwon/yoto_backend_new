@@ -16,8 +16,10 @@ const Model = use('Model')
  *           type: string
  *         reason:
  *           type: string
+ *           enum: [nude, mean, inappropriate, other]
  *         capture:
  *           type: string
+ *           format: binary
  *     Report:
  *       allOf:
  *         - $ref: '#/components/schemas/NewReport'
