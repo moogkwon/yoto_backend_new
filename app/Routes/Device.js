@@ -62,4 +62,4 @@ Route.group('device', () => {
    */
   Route.delete('/:device_id', 'Api/DevicesController.destroy')
     .middleware(['auth'])
-}).prefix('/api/devices')
+}).prefix('/api/v1/devices')
