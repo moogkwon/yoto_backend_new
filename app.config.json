@@ -6,7 +6,13 @@
       "instances": "max",
       "exec_mode": "cluster",
       "env": {
-        "watch": true,
+        "watch": [
+          "app",
+          "config",
+          "start",
+          "server.js",
+          ".env"
+        ],
         "NODE_ENV": "development",
         "DEBUG": "mquery,socket"
       },
@@ -20,7 +26,13 @@
       "script": "./ace",
       "args": "send:notification",
       "env": {
-        "watch": true,
+        "watch": [
+          "app",
+          "config",
+          "start",
+          "server.js",
+          ".env"
+        ],
         "NODE_ENV": "development",
         "DEBUG": false
       },
