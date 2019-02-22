@@ -126,7 +126,7 @@ class ChatController {
       if (_.size(conversation.accepts) === 2) {
         // change conversation state
         conversation.status = 'calling'
-        conversation.start_at = moment()
+        conversation.started_at = moment()
         // find and emit calling to other user
         const userId = conversation.user_ids.find(id => String(id) !== String(this.user._id))
         const otherUser = await User.find(userId)
@@ -263,8 +263,8 @@ class ChatController {
       debug('Outgoing', 'call_hangup', { conversation_id: conversation._id, message: 'you hungup' })
       await Redis.sadd('hunting', String(this.user._id))
       conversation.status = 'closed'
-      conversation.end_at = moment()
-      conversation.call_time = moment().diff(conversation.start_at)
+      conversation.ended_at = moment()
+      conversation.call_time = moment().diff(conversation.started_at)
       await conversation.save()
     } else {
       this.socket.toMe().emit('message', { message: 'you are not in calling' })
@@ -287,7 +287,10 @@ class ChatController {
           socket.socket.toMe().emit('match_close', { conversation_id: conversation._id, message: 'other user disconnected' })
           await Redis.sadd('hunting', String(userId))
         }
-        conversation.status = 'rejected'
+        conversation.status = conversation.status === 'calling' ? 'closed' : 'rejected'
+        if (conversation.started_at) {
+          conversation.call_time = moment().diff(conversation.started_at)
+        }
         await conversation.save()
       }
       await Redis.hdel('users', this.user._id)
