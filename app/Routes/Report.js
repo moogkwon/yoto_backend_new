@@ -56,11 +56,14 @@ Route.group('report', () => {
    *               reason:
    *                 required: true
    *                 type: string
+   *                 enum: [nude, mean, inappropriate, other]
    *     responses:
    *       200:
    *         description: report
-   *         schema:
-   *           $ref: '#/components/schemas/Report'
+   *         content:
+   *           application/json:
+   *             schema:
+   *               $ref: '#/components/schemas/Report'
    */
   Route.post('/', 'Api/ReportsController.store')
     .middleware(['auth:jwt'])
