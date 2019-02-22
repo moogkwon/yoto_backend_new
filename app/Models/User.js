@@ -141,6 +141,10 @@ class User extends Model {
   device () {
     return this.hasOne('App/Models/Device')
   }
+
+  payments () {
+    return this.hasMany('App/Models/Payment')
+  }
 }
 
 module.exports = User

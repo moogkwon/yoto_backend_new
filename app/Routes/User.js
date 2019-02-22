@@ -21,7 +21,7 @@ Route.group('user', () => {
    *       - $ref: '#/components/parameters/ListQuery'
    *     responses:
    *       200:
-   *         description: friends
+   *         description: list user
    *         content:
    *           application/json:
    *             schema:
