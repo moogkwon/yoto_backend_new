@@ -6,6 +6,7 @@ const Redis = use('Redis')
 const _ = require('lodash')
 const User = use('App/Models/User')
 const moment = require('moment')
+const Config = use('Config')
 
 class ChatController {
   /**
@@ -52,8 +53,11 @@ class ChatController {
     const conversation = await this.user.conversations().where({ status: { $nin: ['closed', 'rejected'] } }).first()
     if (conversation) {
       this.socket.toMe().emit('match_exists', { conversation_id: conversation._id })
-      debug('Outgoing', 'match_exists', this.user._id, this.socket.id)
+      debug('Outgoing', 'match_exists', this.user._id, this.socket.id, { conversation_id: conversation._id })
     }
+    const iceServers = Config.get('iceServer.iceServers')
+    this.socket.toMe().emit('ice_server', { message: 'connected success', ice_servers: iceServers })
+    debug('Outgoing', 'ice_server', this.user._id, this.socket.id, { message: 'connected success', ice_servers: iceServers })
     this.user.is_online = true
     await this.user.save()
   }
@@ -115,6 +119,22 @@ class ChatController {
     debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you rejoined hunting mode' })
   }
 
+  async on_reaction (data) { // eslint-disable-line
+    debug('=========================================================')
+    debug('Incoming', '_react', this.user._id, this.socket.id)
+    const chatChannel = Ws.channel('/chat')
+    const userId = data.user_id
+    const socketid = await Redis.hget('users', userId)
+    const socket = chatChannel.get(socketid)
+    if (socket) {
+      socket.socket.toMe().emit('react', data)
+      debug('Outgoing', 'react', data)
+    } else {
+      socket.socket.toMe().emit('message', { message: 'other user not found' })
+      debug('Outgoing', 'message', { message: 'other user not found' })
+    }
+  }
+
   async on_match_accept (data) { // eslint-disable-line
     debug('=========================================================')
     debug('Incoming', '_match_accept', this.user._id, this.socket.id)
@@ -122,8 +142,8 @@ class ChatController {
     const conversation = await this.user.conversations().where({ status: 'waiting' }).first()
     if (conversation) {
       conversation.accepts[String(this.user._id)] = true
-      conversation.offers[String(this.user._id)] = data.offer || []
-      if (_.size(conversation.accepts) === 2) {
+      // conversation.offers[String(this.user._id)] = data.offer || ''
+      if (conversation.offer) {
         // change conversation state
         conversation.status = 'calling'
         conversation.started_at = moment()
@@ -134,37 +154,38 @@ class ChatController {
         const socket = chatChannel.get(socketid)
         if (socket) {
           socket.socket.toMe().emit('call_start', {
-            conversation_id: conversation._id,
+            // conversation: conversation.toJSON(),
             user_id: this.user._id,
-            offer: conversation.offers[String(this.user._id)],
+            offer: conversation.offer,
             message: 'prepare to call'
           })
           debug('Outgoing', 'call_start', userId, socket.socket.id, {
-            conversation_id: conversation._id,
+            // conversation: conversation.toJSON(),
             user_id: this.user._id,
-            offer: conversation.offers[userId],
+            offer: conversation.offer.substring(0, 5),
             message: 'prepare to call'
           })
         }
 
         // emit calling to current user
-        this.socket.toMe().emit('call_start', {
-          conversation_id: conversation._id,
-          user_id: userId,
-          message: 'prepare to call'
-        })
-        debug('Outgoing', 'call_start', this.user._id, this.socket.id, {
-          conversation_id: conversation._id,
-          user_id: userId,
-          message: 'prepare to call'
-        })
+        // this.socket.toMe().emit('call_start', {
+        //   conversation_id: conversation._id,
+        //   user_id: userId,
+        //   message: 'prepare to call'
+        // })
+        // debug('Outgoing', 'call_start', this.user._id, this.socket.id, {
+        //   conversation_id: conversation._id,
+        //   user_id: userId,
+        //   message: 'prepare to call'
+        // })
         this.user.call_count = (this.user.call_count || 0) + 1
         otherUser.call_count = (otherUser.call_count || 0) + 1
         await this.user.save()
         await otherUser.save()
       } else {
-        this.socket.toMe().emit('message', { message: 'you accepted match, but other user is not connecting :( wait for a few second' })
-        debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you accepted match, but other user is not connecting :( wait for a few second' })
+        conversation.offer = data.offer
+        this.socket.toMe().emit('message', { message: 'you accepted, wait for other user' })
+        debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you accepted, wait for other user' })
       }
       await conversation.save()
     } else {
@@ -173,9 +194,9 @@ class ChatController {
     }
   }
 
-  async on_update_sdp (data) { // eslint-disable-line
+  async on_call_answer (data) { // eslint-disable-line
     debug('=========================================================')
-    debug('Incoming', '_update_sdp', this.user._id, this.socket.id)
+    debug('Incoming', '_call_answer', this.user._id, this.socket.id)
     const chatChannel = Ws.channel('/chat')
     const conversation = await this.user.conversations().where({ status: 'calling' }).first()
     if (conversation) {
@@ -183,13 +204,42 @@ class ChatController {
       const socketid = await Redis.hget('users', userId)
       const socket = chatChannel.get(socketid)
       if (socket) {
-        socket.socket.toMe().emit('update_sdp', { sdp: data.sdp })
-        debug('Outgoing', 'update_sdp', data.sdp)
+        socket.socket.toMe().emit('call_answered', { sdp: data.sdp })
+        debug('Outgoing', 'call_answered', (data.sdp || '').substring(0, 5))
       }
     } else {
       this.socket.toMe().emit('message', { message: 'you are not in calling' })
       debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you are not in calling' })
     }
+  }
+
+  async on_update_sdp (data) { // eslint-disable-line
+    debug('=========================================================')
+    debug('Incoming', '_update_sdp', this.user._id, this.socket.id)
+    const chatChannel = Ws.channel('/chat')
+    const userId = data.user_id
+    const socketid = await Redis.hget('users', userId)
+    const socket = chatChannel.get(socketid)
+    if (socket) {
+      socket.socket.toMe().emit('update_sdp', { sdp: data.sdp })
+      debug('Outgoing', 'update_sdp', (data.sdp || '').substring(0, 5))
+    } else {
+      socket.socket.toMe().emit('message', { message: 'other user not found' })
+      debug('Outgoing', 'message', { message: 'other user not found' })
+    }
+    // const conversation = await this.user.conversations().where({ status: 'calling' }).first()
+    // if (conversation) {
+    //   const userId = conversation.user_ids.find(id => String(id) !== String(this.user._id))
+    //   const socketid = await Redis.hget('users', userId)
+    //   const socket = chatChannel.get(socketid)
+    //   if (socket) {
+    //     socket.socket.toMe().emit('update_sdp', { sdp: data.sdp })
+    //     debug('Outgoing', 'update_sdp', data.sdp)
+    //   }
+    // } else {
+    //   this.socket.toMe().emit('message', { message: 'you are not in calling' })
+    //   debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you are not in calling' })
+    // }
   }
 
   async on_add_friend (data) { // eslint-disable-line

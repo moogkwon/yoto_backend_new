@@ -14,7 +14,7 @@
           ".env"
         ],
         "NODE_ENV": "development",
-        "DEBUG": "mquery,socket"
+        "DEBUG": "socket"
       },
       "env_production": {
         "NODE_ENV": "production",

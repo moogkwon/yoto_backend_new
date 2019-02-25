@@ -11,7 +11,7 @@ const SendMatching = async function () {
   await Redis.del('hunting')
   userIds = _.shuffle(userIds)
   const pairs = _.chunk(userIds, 2)
-  if (pairs.length) {
+  if (pairs.length > 1) {
     debug('Get list matching', pairs)
   }
   // console.log('pairs', pairs)
