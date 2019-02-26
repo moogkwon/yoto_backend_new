@@ -27,8 +27,8 @@ module.exports = {
     |
     */
     facebook: {
-      clientId: Env.get('FB_CLIENT_ID'),
-      clientSecret: Env.get('FB_CLIENT_SECRET'),
+      clientId: Env.get('FACEBOOK_CLIENT_ID'),
+      clientSecret: Env.get('FACEBOOK_CLIENT_SECRET'),
       redirectUri: `${Env.get('APP_URL')}/authenticated/facebook`
     },
 
