@@ -77,7 +77,7 @@ class ReportsController extends BaseController {
     await request.multipart.process()
     await this.validate(body, {
       requestee_id: 'required|objectId',
-      reason: 'required|in:nude,mean,inappropriate,other'
+      reason: 'required|in:nude,mean,profile,other'
     })
     const otherUser = await User.find(body.requestee_id)
     if (!otherUser) {

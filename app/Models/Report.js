@@ -16,7 +16,7 @@ const Model = use('Model')
  *           type: string
  *         reason:
  *           type: string
- *           enum: [nude, mean, inappropriate, other]
+ *           enum: [nude, mean, profile, other]
  *         capture:
  *           type: string
  *           format: binary

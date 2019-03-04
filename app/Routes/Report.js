@@ -56,7 +56,7 @@ Route.group('report', () => {
    *               reason:
    *                 required: true
    *                 type: string
-   *                 enum: [nude, mean, inappropriate, other]
+   *                 enum: [nude, mean, profile, other]
    *     responses:
    *       200:
    *         description: report
