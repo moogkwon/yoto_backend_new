@@ -56,7 +56,8 @@ class ChatController {
       debug('Outgoing', 'match_exists', this.user._id, this.socket.id, { conversation_id: conversation._id })
     }
 
-    this.socket.toMe().emit('ice_server', { message: 'connected success' })
+    const iceServers = Config.get('iceServer.iceServers')
+    this.socket.toMe().emit('ice_server', { message: 'connected success', ice_servers: iceServers })
     debug('Outgoing', 'ice_server', this.user._id, this.socket.id, { message: 'connected success', ice_servers: iceServers })
     this.user.is_online = true
     await this.user.save()
@@ -146,7 +147,6 @@ class ChatController {
       const otherUser = await User.find(userId)
       const socketid = await Redis.hget('users', userId)
       const socket = chatChannel.get(socketid)
-      const iceServers = Config.get('iceServer.iceServers')
       if (_.size(conversation.accepts) === 2) {
         // change conversation state
         conversation.status = 'calling'
@@ -156,13 +156,11 @@ class ChatController {
           socket.socket.toMe().emit('call_start', {
             // conversation: conversation.toJSON(),
             user_id: this.user._id,
-            ice_servers: iceServers,
             message: 'prepare to call'
           })
           debug('Outgoing', 'call_start', userId, socket.socket.id, {
             // conversation: conversation.toJSON(),
             user_id: this.user._id,
-            ice_servers: iceServers,
             message: 'prepare to call'
           })
         }
@@ -180,13 +178,11 @@ class ChatController {
           socket.socket.toMe().emit('match_offer', {
             // conversation: conversation.toJSON(),
             user_id: this.user._id,
-            ice_servers: iceServers,
             message: `The person want to meet u!`
           })
           debug('Outgoing', 'match_offer', userId, socket.socket.id, {
             // conversation: conversation.toJSON(),
             user_id: this.user._id,
-            ice_servers: iceServers,
             message: `The person want to meet u!`
           })
         }
