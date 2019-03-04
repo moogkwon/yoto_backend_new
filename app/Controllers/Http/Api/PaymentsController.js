@@ -11,6 +11,9 @@ const BaseController = use('App/Controllers/Http/Api/BaseController')
 const Payment = use('App/Models/Payment')
 // const Exceptions = use('Exceptions')
 const ResourceNotFoundException = use('App/Exceptions/ResourceNotFoundException')
+const Ws = use('Ws')
+const Redis = use('Redis')
+const debug = require('debug')('socket')
 
 /**
  *
@@ -69,6 +72,29 @@ class PaymentsController extends BaseController {
       user_name: auth.user.name
     })
     await payment.save()
+    const chatChannel = Ws.channel('/chat')
+    const conversation = await this.user.conversations().where({ status: 'calling' }).first()
+    if (conversation) {
+      {
+        const socketid = await Redis.hget('users', String(auth.user._id))
+        const socket = chatChannel.get(socketid)
+        if (socket) {
+          socket.socket.toMe().emit('call_unlocked', { conversation_id: conversation._id })
+          debug('Outgoing', 'call_unlocked', auth.user._id, socketid)
+        }
+      }
+      {
+        const userId = conversation.user_ids.find(id => String(id) !== String(this.user._id))
+        const socketid = await Redis.hget('users', String(userId))
+        const socket = chatChannel.get(socketid)
+        if (socket) {
+          socket.socket.toMe().emit('call_unlocked', { conversation_id: conversation._id })
+          debug('Outgoing', 'call_unlocked', userId, socketid)
+        }
+      }
+      conversation.unlocked = true
+      await conversation.save()
+    }
     return response.apiCreated(payment)
   }
 
