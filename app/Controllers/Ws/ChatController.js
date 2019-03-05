@@ -59,6 +59,15 @@ class ChatController {
     const iceServers = Config.get('iceServer.iceServers')
     this.socket.toMe().emit('ice_server', { message: 'connected success', ice_servers: iceServers })
     debug('Outgoing', 'ice_server', this.user._id, this.socket.id, { message: 'connected success', ice_servers: iceServers })
+    if (this.user.is_new) {
+      this.socket.toMe().emit('notify', {
+        title: 'This is month\'s promotion',
+        message: 'We will send you $1 by PayPal once you make 100 friends 👫\nDM us @getyoto when you reach this goal 🎉',
+        label: 'Let\'s get started 🎉'
+      })
+      debug('Outgoing', 'notify', this.user._id, this.socket.id)
+      this.user.is_new = false
+    }
     this.user.is_online = true
     await this.user.save()
   }

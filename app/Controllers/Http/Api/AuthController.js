@@ -166,7 +166,8 @@ class AuthController extends BaseController {
       avatar_url: socialUser.getAvatar(),
       is_blocked: false,
       profile_rejected: false,
-      is_online: false
+      is_online: false,
+      is_new: true
     })
     const data = await auth.authenticator('jwt').withRefreshToken().generate(user)
     data.data = user
