@@ -138,8 +138,8 @@ class User extends Model {
     return this.hasMany('App/Models/Report', '_id', 'reportee_id')
   }
 
-  device () {
-    return this.hasOne('App/Models/Device')
+  devices () {
+    return this.hasMany('App/Models/Device')
   }
 
   payments () {

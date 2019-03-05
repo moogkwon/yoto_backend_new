@@ -4,14 +4,10 @@
 
 const BaseController = require('./BaseController')
 /** @type {typeof import('../../../Models/User')} */
-const User = use('App/Models/User')
+// const User = use('App/Models/User')
 // const Validator = use('Validator')
-const UnAuthorizeException = use('App/Exceptions/UnAuthorizeException')
+// const UnAuthorizeException = use('App/Exceptions/UnAuthorizeException')
 // const Config = use('Config')
-const Drive = use('Drive')
-const debug = require('debug')('socket')
-const Ws = use('Ws')
-const Redis = use('Redis')
 
 /**
  *
