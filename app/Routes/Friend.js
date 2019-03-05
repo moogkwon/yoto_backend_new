@@ -29,6 +29,6 @@ Route.group('friend', () => {
    *               items:
    *                   $ref: '#/components/schemas/User'
    */
-  Route.get('/', 'Api/UsersController.index')
+  Route.get('/', 'Api/FriendsController.index')
     .middleware(['auth:jwt'])
 }).prefix('/api/v1/friends')
