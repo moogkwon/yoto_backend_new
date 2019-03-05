@@ -22,14 +22,7 @@ Route.group('device', () => {
    *       content:
    *         application/json:
    *           schema:
-   *             type: object
-   *             properties:
-   *               device_token:
-   *                 type: string
-   *                 required: true
-   *               device_type:
-   *                 type: string
-   *                 required: true
+   *             $ref: '#/components/schemas/NewDevice'
    *     responses:
    *       200:
    *         description: item

@@ -10,7 +10,9 @@ const Model = use('Model')
  *     NewDevice:
  *       type: object
  *       properties:
- *         user_id:
+ *         device_id:
+ *           type: string
+ *         device_type:
  *           type: string
  *         token:
  *           type: string
@@ -20,6 +22,8 @@ const Model = use('Model')
  *         - type: object
  *           properties:
  *             _id:
+ *               type: string
+ *             user_id:
  *               type: string
  *             status:
  *               type: string
