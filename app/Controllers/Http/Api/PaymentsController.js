@@ -73,7 +73,7 @@ class PaymentsController extends BaseController {
     })
     await payment.save()
     const chatChannel = Ws.channel('/chat')
-    const conversation = await this.user.conversations().where({ status: 'calling' }).first()
+    const conversation = await auth.user.conversations().where({ status: 'calling' }).first()
     if (conversation) {
       {
         const socketid = await Redis.hget('users', String(auth.user._id))
@@ -84,7 +84,7 @@ class PaymentsController extends BaseController {
         }
       }
       {
-        const userId = conversation.user_ids.find(id => String(id) !== String(this.user._id))
+        const userId = conversation.user_ids.find(id => String(id) !== String(auth.user._id))
         const socketid = await Redis.hget('users', String(userId))
         const socket = chatChannel.get(socketid)
         if (socket) {
