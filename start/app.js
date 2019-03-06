@@ -75,7 +75,8 @@ const aliases = {
 */
 const commands = [
   'App/Commands/Swagger',
-  'App/Commands/SendNotification'
+  'App/Commands/SendNotification',
+  'App/Commands/S3Url'
 ]
 
 module.exports = { providers, aceProviders, aliases, commands }

@@ -68,7 +68,7 @@ class ReportsController extends BaseController {
       const fileName = `uploads/reports/${use('uuid').v1().replace(/-/g, '')}_${file.clientName}`
       await Drive.disk('s3').put(fileName, file.stream)
       report.file = fileName
-      report.file_url = await Drive.disk('s3').getUrl(fileName)
+      report.file_url = await Drive.disk('s3').getSignedUrl(fileName, 10 * 360 * 86400)
     })
 
     request.multipart.field((name, value) => {
