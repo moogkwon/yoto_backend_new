@@ -25,6 +25,22 @@ module.exports = {
 
   /*
   |--------------------------------------------------------------------------
+  | cache connection config
+  |--------------------------------------------------------------------------
+  |
+  | Configuration for a named connection.
+  |
+  */
+  cache: {
+    host: Env.get('REDIS_HOST', 'localhost'),
+    port: Env.get('REDIS_PORT', 6379),
+    password: Env.get('REDIS_PASSWORD', null),
+    db: Env.get('REDIS_DB', 0),
+    keyPrefix: Env.get('REDIS_PREFIX', '')
+  },
+
+  /*
+  |--------------------------------------------------------------------------
   | local connection config
   |--------------------------------------------------------------------------
   |
