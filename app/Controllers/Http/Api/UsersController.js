@@ -12,6 +12,7 @@ const Drive = use('Drive')
 const debug = require('debug')('socket')
 const Ws = use('Ws')
 const Redis = use('Redis')
+const CloudFront = use('App/Utils/CloudFront')
 
 /**
  *
@@ -244,7 +245,8 @@ class UsersController extends BaseController {
         } catch (error) { }
       }
       user.avatar = fileName
-      user.avatar_url = await Drive.disk('s3').getSignedUrl(fileName, 10 * 360 * 86400)
+      // user.avatar_url = await Drive.disk('s3').getSignedUrl(fileName, 10 * 360 * 86400)
+      user.avatar_url = CloudFront.mediaUrl(user.avatar)
       await user.save()
     })
 
@@ -275,7 +277,8 @@ class UsersController extends BaseController {
         } catch (error) { }
       }
       user.profile_photo = fileName
-      user.profile_photo_url = await Drive.disk('s3').getSignedUrl(fileName, 10 * 360 * 86400)
+      // user.profile_photo_url = await Drive.disk('s3').getSignedUrl(fileName, 10 * 360 * 86400)
+      user.profile_photo_url = CloudFront.mediaUrl(user.profile_photo)
       user.profile_video_url = null
       user.profile_rejected = false
       await user.save()
@@ -308,7 +311,8 @@ class UsersController extends BaseController {
         } catch (error) { }
       }
       user.profile_video = fileName
-      user.profile_video_url = await Drive.disk('s3').getSignedUrl(fileName, 10 * 360 * 86400)
+      // user.profile_video_url = await Drive.disk('s3').getSignedUrl(fileName, 10 * 360 * 86400)
+      user.profile_video_url = CloudFront.mediaUrl(user.profile_video)
       user.profile_photo_url = null
       user.profile_rejected = false
       await user.save()

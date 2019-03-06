@@ -12,6 +12,7 @@ const UnAuthorizeException = use('App/Exceptions/UnAuthorizeException')
 const ValidateErrorException = use('App/Exceptions/ValidateErrorException')
 // const Config = use('Config')
 const Drive = use('Drive')
+const CloudFront = use('App/Utils/CloudFront')
 
 /**
  *
@@ -68,7 +69,8 @@ class ReportsController extends BaseController {
       const fileName = `uploads/reports/${use('uuid').v1().replace(/-/g, '')}_${file.clientName}`
       await Drive.disk('s3').put(fileName, file.stream)
       report.file = fileName
-      report.file_url = await Drive.disk('s3').getSignedUrl(fileName, 10 * 360 * 86400)
+      // report.file_url = await Drive.disk('s3').getSignedUrl(fileName, 10 * 360 * 86400)
+      report.file_url = CloudFront.mediaUrl(fileName)
     })
 
     request.multipart.field((name, value) => {
