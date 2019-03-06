@@ -53,7 +53,7 @@ class PaymentsController extends BaseController {
       device_id: 'required',
       device_os: 'required|in:ios,android',
       product_id: 'required',
-      subscription_duration: 'required',
+      // subscription_duration: 'required',
       transaction_receipt: 'required',
       transaction_id: 'required',
       transaction_date: 'required'
@@ -62,7 +62,7 @@ class PaymentsController extends BaseController {
       'device_id',
       'device_os',
       'product_id',
-      'subscription_duration',
+      // 'subscription_duration',
       'transaction_receipt',
       'transaction_id',
       'transaction_date'

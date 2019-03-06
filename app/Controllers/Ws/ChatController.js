@@ -261,27 +261,27 @@ class ChatController {
     debug('=========================================================')
     debug('Incoming', '_call_unlock', this.user._id, this.socket.id)
     const chatChannel = Ws.channel('/chat')
-    const payment = await this.user.payments().first()
-    if (payment) {
-      const conversation = await this.user.conversations().where({ status: 'calling' }).first()
-      if (conversation) {
-        const userId = conversation.user_ids.find(id => String(id) !== String(this.user._id))
-        const socketid = await Redis.hget('users', userId)
-        const socket = chatChannel.get(socketid)
-        if (socket) {
-          socket.socket.toMe().emit('call_unlocked', { conversation_id: conversation._id })
-          debug('Outgoing', 'call_unlocked', userId, socketid)
-        }
-        conversation.unlocked = true
-        await conversation.save()
-      } else {
-        this.socket.toMe().emit('message', { message: 'you are not in calling' })
-        debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you are not in calling' })
+    // const payment = await this.user.payments().first()
+    // if (payment) {
+    const conversation = await this.user.conversations().where({ status: 'calling' }).first()
+    if (conversation) {
+      const userId = conversation.user_ids.find(id => String(id) !== String(this.user._id))
+      const socketid = await Redis.hget('users', userId)
+      const socket = chatChannel.get(socketid)
+      if (socket) {
+        socket.socket.toMe().emit('call_unlocked', { conversation_id: conversation._id })
+        debug('Outgoing', 'call_unlocked', userId, socketid)
       }
+      conversation.unlocked = true
+      await conversation.save()
     } else {
-      this.socket.toMe().emit('payment_require', { message: 'buy a subscription to unlock calling' })
-      debug('Outgoing', 'payment_require', this.user._id, this.socket.id, { message: 'buy a subscription to unlock calling' })
+      this.socket.toMe().emit('message', { message: 'you are not in calling' })
+      debug('Outgoing', 'message', this.user._id, this.socket.id, { message: 'you are not in calling' })
     }
+    // } else {
+    //   this.socket.toMe().emit('payment_require', { message: 'buy a subscription to unlock calling' })
+    //   debug('Outgoing', 'payment_require', this.user._id, this.socket.id, { message: 'buy a subscription to unlock calling' })
+    // }
   }
 
   async on_add_friend (data) { // eslint-disable-line
