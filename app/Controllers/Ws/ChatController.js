@@ -61,8 +61,8 @@ class ChatController {
     debug('Outgoing', 'ice_server', this.user._id, this.socket.id, { message: 'connected success', ice_servers: iceServers })
     if (this.user.is_new) {
       this.socket.toMe().emit('notify', {
-        title: 'This is month\'s promotion',
-        message: 'We will send you $1 by PayPal once you make 100 friends 👫\nDM us @getyoto when you reach this goal 🎉',
+        title: 'This month\'s promotion',
+        message: 'The first person who makes 100 friends will receive $100 worth of gift \n\nDM @getyoto on Instagram when you reach this goal 🎁',
         label: 'Let\'s get started 🎉'
       })
       debug('Outgoing', 'notify', this.user._id, this.socket.id)
