@@ -15,6 +15,8 @@ const Mail = use('Mail')
 const crypto = require('crypto')
 const uuid = require('uuid')
 const User = use('App/Models/User')
+const Api = require('apisauce').create
+const Env = use('Env')
 
 class AuthController extends BaseController {
   /**
@@ -136,8 +138,11 @@ class AuthController extends BaseController {
    */
   async socialLogin ({ request, response, auth, ally, params }) {
     const social = params.social
-    await this.validate({ social }, { social: 'required|in:facebook,google' })
+    await this.validate({ social }, { social: 'required|in:facebook,google,phone' })
     await this.validate(request.all(), { social_token: 'required|string' })
+    if (social === 'phone') {
+      return this.phoneLogin(...arguments)
+    }
     const socialToken = request.input('social_token')
     let clientSecret = Config.get('services.ally')[social].clientSecret
     let socialUser = null
@@ -164,6 +169,48 @@ class AuthController extends BaseController {
       social_id: socialUser.getId(),
       password: use('uuid').v4(),
       avatar_url: socialUser.getAvatar(),
+      is_blocked: false,
+      profile_rejected: false,
+      is_online: false,
+      is_new: true
+    })
+    const data = await auth.authenticator('jwt').withRefreshToken().generate(user)
+    data.data = user
+    return response.json(data)
+  }
+
+  /**
+   * phone login
+   *
+   * @param {object} ctx
+   * @param {Response} ctx.response
+   * @param {Request} ctx.request
+   * @param {AuthJwt} ctx.auth
+   * @returns
+   *
+   * @memberOf AuthController
+   *
+   */
+  async phoneLogin ({ request, response, auth }) {
+    const socialToken = request.input('social_token')
+    const appSecret = Env.get('ACCOUNT_KIT_APP_SECRET')
+    const appsecretProof = crypto.createHmac('sha256', appSecret).update(socialToken).digest('hex')
+    const accountKitResponse = await Api({ baseURL: 'https://graph.accountkit.com/v1.3' })
+      .get('/me', { access_token: socialToken, appsecret_proof: appsecretProof })
+    // console.log(accountKitResponse)
+    if (!accountKitResponse.ok) {
+      throw LoginFailedException.invoke('Invalid token')
+    }
+
+    let user = await User.findOrCreate({ phone_number: accountKitResponse.data.phone.national_number, social: 'phone' }, {
+      first_name: '',
+      last_name: '',
+      verified: true,
+      social: 'phone',
+      social_token: socialToken,
+      social_id: accountKitResponse.data.id,
+      password: use('uuid').v4(),
+      avatar_url: '',
       is_blocked: false,
       profile_rejected: false,
       is_online: false,
